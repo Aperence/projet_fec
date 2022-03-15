@@ -46,10 +46,6 @@ void gf_256_gaussian_elimination(uint8_t **A, uint8_t **B, uint32_t symbol_size,
     uint8_t lam1 = 0;
     uint8_t lam2 = 0;
 
-    uint8_t *temp = malloc(system_size);
-
-    uint8_t *tempSymb = malloc(symbol_size);
-
     // forward reduction  
     /* 
        [ a  b ]  lam1 = a
