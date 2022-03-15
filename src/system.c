@@ -19,7 +19,7 @@ uint8_t *gf_256_full_add_vector(uint8_t *symbol_1, uint8_t *symbol_2, uint32_t s
     {
         *(r+i) = *(symbol_1+i) ^ *(symbol_2 + i);
     }
-    return *r;
+    return r;
 }
 
 uint8_t *gf_256_mul_vector(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_size){
@@ -28,7 +28,7 @@ uint8_t *gf_256_mul_vector(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_size
     {
         *(r+i) = gf256_mul_table[*(symbol_1+i)][coef];
     }
-    return *r;
+    return r;
 }
 
 uint8_t *gf_256_inv_vector(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_size){
