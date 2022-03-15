@@ -57,10 +57,10 @@ void gf_256_gaussian_elimination(uint8_t **A, uint8_t **B, uint32_t symbol_size,
     */
     for (int i = 0; i < system_size; i++)
     {
-        lam1 = *(A + i*system_size + i);
+        lam1 = *(*(A + i) + i);
         for (int j = i+1; j < system_size; j++)
         {
-            lam2 = *(A + j*system_size + i);
+            lam2 = *(*(A + j) + i);
             *(A+j) = subrow(*(A+j), *(A+i), lam1, lam2, system_size);
             *(B+j) = subrow(*(B+j), *(B+i), lam1, lam2, symbol_size);
         }
@@ -73,12 +73,12 @@ void gf_256_gaussian_elimination(uint8_t **A, uint8_t **B, uint32_t symbol_size,
     //backward reduction
     for (int i = system_size - 1 ; i >= 0; i--)
     {
-        lam1 = *(A + i*system_size + i);
+        lam1 = *(*(A + i) + i);
         *(A+i) = gf_256_inv_vector(*(A+i), lam1 , system_size);
         *(B+i) = gf_256_inv_vector(*(B+i), lam1, symbol_size);
         for (int j = i-1; j >= 0; j--)
         {
-            lam2 = *(A + j*system_size + i);
+            lam2 = *(*(A + j) + i);
             *(A+j) = subrow(*(A+j), *(A+i), 1, -lam2, system_size);
             *(B+j) = subrow(*(B+j), *(B+i), 1, -lam2, system_size);
         }
