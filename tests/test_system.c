@@ -1,8 +1,10 @@
 #include <CUnit/Basic.h>
-#include "system.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include "gf256_tables.h"
 #include "test_system.h"
+#include "testRun.h"
+#include "system.h"
 
 void test_add_full_vector(){
     uint8_t v[] = {1,2,3,4,5};
@@ -17,6 +19,7 @@ void test_add_full_vector(){
         CU_ASSERT_EQUAL(*(v+i), *(v_copy+i));
         CU_ASSERT_EQUAL(*(u+i), *(u_copy+i));
     }
+    free(res);
     return;
 }
 
@@ -31,6 +34,7 @@ void test_mult_full_vector(){
         CU_ASSERT_EQUAL(*(res+i), expected[i]);
         CU_ASSERT_EQUAL(*(v+i), *(v_copy+i));
     }
+    free(res);
     return;
 }
 
@@ -46,7 +50,9 @@ void test_random_coeff_generation(){
         {
             CU_ASSERT_EQUAL(*(*(mat+i)+j), expected_res[i*size+j]);
         }
+        free(*(mat+i));
     }
+    free(mat);
     return;
 }
 
@@ -57,16 +63,15 @@ void addSuiteSystem(){
     CU_add_test(suite, "test full mult vector", test_mult_full_vector);
     CU_add_test(suite, "correct_coeffs", test_random_coeff_generation);
 }
-/**
-int main()
+
+#if MULTIPLE
+int main(int argc, char const *argv[])
 {
     CU_initialize_registry();
-    CU_pSuite suite = CU_add_suite("system", 0, 0);
-    CU_add_test(suite, "test full add vector", test_add_full_vector);
-    CU_add_test(suite, "test full mult vector", test_mult_full_vector);
-    CU_add_test(suite, "correct_coeffs", test_random_coeff_generation);
-    
+    addSuiteSystem();
 
     CU_basic_run_tests();
     CU_basic_show_failures(CU_get_failure_list());
-}*/
+    return 0;
+}
+#endif

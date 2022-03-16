@@ -1,7 +1,8 @@
-#include "tinymt32.h"
 #include <CUnit/Basic.h>
-#include "test_tinymt32.h"
 #include <stdio.h>
+#include "test_tinymt32.h"
+#include "tinymt32.h"
+#include "testRun.h"
 
 void test_tinymt32_gen_42()
 {
@@ -28,13 +29,15 @@ void addSuiteTinymt(){
     CU_pSuite suite = CU_add_suite("tinymt32", 0, 0);
     CU_add_test(suite, "correct_coeffs", test_tinymt32_gen_42);
 }
-/**
-int main()
+
+#if MULTIPLE
+int main(int argc, char const *argv[])
 {
     CU_initialize_registry();
-    CU_pSuite suite = CU_add_suite("tinymt32", 0, 0);
-    CU_add_test(suite, "correct_coeffs", test_tinymt32_gen_42);
+    addSuiteTinymt();
 
     CU_basic_run_tests();
     CU_basic_show_failures(CU_get_failure_list());
-}*/
+    return 0;
+}
+#endif // !MULTIPLE

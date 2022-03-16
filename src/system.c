@@ -46,6 +46,8 @@ void gf_256_gaussian_elimination(uint8_t **A, uint8_t **B, uint32_t symbol_size,
     uint8_t lam1 = 0;
     uint8_t lam2 = 0;
 
+    uint8_t **temp = malloc(sizeof(uint8_t*));
+
     // forward reduction  
     /* 
        [ a  b ]  lam1 = a
@@ -57,8 +59,12 @@ void gf_256_gaussian_elimination(uint8_t **A, uint8_t **B, uint32_t symbol_size,
         for (int j = i+1; j < system_size; j++)
         {
             lam2 = *(*(A + j) + i);
+            *temp = *(A+j);
             *(A+j) = subrow(*(A+j), *(A+i), lam1, lam2, system_size);
+            free(*temp);
+            *temp = *(B+j);
             *(B+j) = subrow(*(B+j), *(B+i), lam1, lam2, symbol_size);
+            free(*temp);
         }
     }
     
@@ -70,17 +76,24 @@ void gf_256_gaussian_elimination(uint8_t **A, uint8_t **B, uint32_t symbol_size,
     for (int i = system_size - 1 ; i >= 0; i--)
     {
         lam1 = *(*(A + i) + i);
+        *temp = *(A+i);
         *(A+i) = gf_256_inv_vector(*(A+i), lam1 , system_size);
+        free(temp);
+        *temp = *(B+i);
         *(B+i) = gf_256_inv_vector(*(B+i), lam1, symbol_size);
+        free(temp);
         for (int j = i-1; j >= 0; j--)
         {
             lam2 = *(*(A + j) + i);
+            *temp = *(A+j);
             *(A+j) = subrow(*(A+j), *(A+i), 1, -lam2, system_size);
+            free(temp);
+            *temp = *(B+j);
             *(B+j) = subrow(*(B+j), *(B+i), 1, -lam2, system_size);
+            free(temp);
         }
     }
     return;
-    
 }
 
 uint8_t **gen_coefs(uint32_t seed, uint32_t nss, uint32_t nrs){
