@@ -17,14 +17,12 @@ clean:
 	@rm -f fec
 	@rm -f ./bin/*
 
-test_system: tests/test_system.o src/system.o
+test_system: ./src/tinymt32.o
 	$(CC) $(INCLUDE_HEADERS_DIRECTORY) $(INCLUDE_CUNIT) $(LINK_CUNIT) -o ./bin/$@ $^ -lcunit
 
-tests:
-	$(CC) $(INCLUDE_HEADERS_DIRECTORY) $(INCLUDE_CUNIT) $(LINK_CUNIT) -o ./bin/test_tinymt32 ./tests/test_tinymt32.c  -lcunit
-	./bin/test_tinymt32
-	make test_system
-	./bin/test_system
+tests: ./tests/testRun.o ./tests/test_tinymt32.o tests/test_system.o src/system.o ./src/tinymt32.o
+	$(CC) $(INCLUDE_HEADERS_DIRECTORY) $(INCLUDE_CUNIT) $(LINK_CUNIT) -o ./bin/testing $^ -lcunit
+	./bin/testing
 
 # a .PHONY target forces make to execute the command even if the target already exists
 .PHONY: clean tests

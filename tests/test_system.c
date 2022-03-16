@@ -1,7 +1,8 @@
 #include <CUnit/Basic.h>
 #include "system.h"
 #include <stdio.h>
-#include <gf256_tables.h>
+#include "gf256_tables.h"
+#include "test_system.h"
 
 void test_add_full_vector(){
     uint8_t v[] = {1,2,3,4,5};
@@ -49,6 +50,14 @@ void test_random_coeff_generation(){
     return;
 }
 
+void addSuiteSystem(){
+    printf("Loaded System !\n");
+    CU_pSuite suite = CU_add_suite("system", 0, 0);
+    CU_add_test(suite, "test full add vector", test_add_full_vector);
+    CU_add_test(suite, "test full mult vector", test_mult_full_vector);
+    CU_add_test(suite, "correct_coeffs", test_random_coeff_generation);
+}
+/**
 int main()
 {
     CU_initialize_registry();
@@ -60,4 +69,4 @@ int main()
 
     CU_basic_run_tests();
     CU_basic_show_failures(CU_get_failure_list());
-}
+}*/
