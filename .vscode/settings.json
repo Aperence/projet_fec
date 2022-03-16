@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "basic.h": "c",
+        "tinymt32.h": "c",
+        "test_tinymt32.h": "c"
+    }
+}
