@@ -13,87 +13,77 @@
 #include "tinymt32.h"
 
 
-uint8_t *gf_256_full_add_vector(uint8_t *symbol_1, uint8_t *symbol_2, uint32_t symbol_size){
-    uint8_t *r = malloc(sizeof(uint8_t)*symbol_size);
+void gf_256_full_add_vector(uint8_t *symbol_1, uint8_t *symbol_2, uint32_t symbol_size){
     for (int i = 0; i < symbol_size; i++)
     {
-        *(r+i) = *(symbol_1+i) ^ *(symbol_2 + i);
+        *(symbol_1+i) = *(symbol_1+i) ^ *(symbol_2 + i);
     }
-    return r;
 }
 
-uint8_t *gf_256_mul_vector(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_size){
-    uint8_t *r = malloc(sizeof(uint8_t)*symbol_size);
+void gf_256_mul_vector(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_size){
     for (int i = 0; i < symbol_size; i++)
     {
-        *(r+i) = gf256_mul_table[*(symbol_1+i)][coef];
+        *(symbol_1+i) = gf256_mul_table[*(symbol_1+i)][coef];
     }
-    return r;
 }
 
-uint8_t *gf_256_inv_vector(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_size){
-    return gf_256_mul_vector(symbol_1, gf256_inv_table[coef], symbol_size);
+void gf_256_inv_vector(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_size){
+    gf_256_mul_vector(symbol_1, gf256_inv_table[coef], symbol_size);
 }
 
-uint8_t *subrow(uint8_t *firstRow, uint8_t *secondRow, uint8_t lam1, uint8_t lam2, uint32_t size){
-    return gf_256_full_add_vector(firstRow, 
-        gf_256_mul_vector(gf_256_inv_vector(secondRow, 
-        lam1, size), -lam2, size),
-        size);
+
+void printMatrix(uint8_t **matrix, uint32_t n, uint32_t m){
+    for (int i = 0; i < n; i++)
+    {
+        printf("[ ");
+        for (int j = 0; j < m; j++)
+        {
+            printf("%d\t", *(*(matrix+i)+j));
+        }
+        printf(" ]\n");
+    }
+    
 }
 
 void gf_256_gaussian_elimination(uint8_t **A, uint8_t **B, uint32_t symbol_size, uint32_t system_size){
-    uint8_t lam1 = 0;
-    uint8_t lam2 = 0;
-
-    uint8_t **temp = malloc(sizeof(uint8_t*));
-
+    uint8_t factor = 0;
     // forward reduction  
     /* 
-       [ a  b ]  lam1 = a
-       [ c  d ]  lam2 = c
+       [ a  b ]  
+       [ c  d ]  
     */
     for (int i = 0; i < system_size; i++)
     {
-        lam1 = *(*(A + i) + i);
         for (int j = i+1; j < system_size; j++)
         {
-            lam2 = *(*(A + j) + i);
-            *temp = *(A+j);
-            *(A+j) = subrow(*(A+j), *(A+i), lam1, lam2, system_size);
-            free(*temp);
-            *temp = *(B+j);
-            *(B+j) = subrow(*(B+j), *(B+i), lam1, lam2, symbol_size);
-            free(*temp);
+            factor = gf256_mul_table[*(*(A+j)+i)][gf256_inv_table[*(*(A+i)+i)]];
+            gf_256_mul_vector(*(A+i), factor, system_size);
+            gf_256_full_add_vector(*(A+j), *(A+i), system_size);
+
+            gf_256_mul_vector(*(B+i), factor, symbol_size);
+            gf_256_full_add_vector(*(B+j), *(B+i), symbol_size);
         }
     }
-    
+
     /*
-       [ a  b ]  lam1 = a
-       [ 0  d ]  lam2 = c
+       [ a  b ] 
+       [ 0  d ]
     */
     //backward reduction
-    for (int i = system_size - 1 ; i >= 0; i--)
+    for (int i = system_size-1; i >=0 ; i--)
     {
-        lam1 = *(*(A + i) + i);
-        *temp = *(A+i);
-        *(A+i) = gf_256_inv_vector(*(A+i), lam1 , system_size);
-        free(temp);
-        *temp = *(B+i);
-        *(B+i) = gf_256_inv_vector(*(B+i), lam1, symbol_size);
-        free(temp);
-        for (int j = i-1; j >= 0; j--)
+        for (int j = i-1; j >=0 ; j--)
         {
-            lam2 = *(*(A + j) + i);
-            *temp = *(A+j);
-            *(A+j) = subrow(*(A+j), *(A+i), 1, -lam2, system_size);
-            free(temp);
-            *temp = *(B+j);
-            *(B+j) = subrow(*(B+j), *(B+i), 1, -lam2, system_size);
-            free(temp);
+            factor = gf256_mul_table[*(*(A+j)+i)][gf256_inv_table[*(*(A+i)+i)]];
+            *(*(A+j)+i) = *(*(A+j)+i) ^ gf256_mul_table[*(*(A+i)+i)][factor];
+
+            gf_256_mul_vector(*(B+i), factor, symbol_size);
+            gf_256_full_add_vector(*(B+j), *(B+i), symbol_size);
         }
+        factor = gf256_inv_table[*(*(A+i)+i)];
+        *(*(A+i)+i) = gf256_mul_table[*(*(A+i)+i)][factor];
+        gf_256_mul_vector(*(B+i), factor, symbol_size);
     }
-    return;
 }
 
 uint8_t **gen_coefs(uint32_t seed, uint32_t nss, uint32_t nrs){
@@ -116,3 +106,36 @@ uint8_t **gen_coefs(uint32_t seed, uint32_t nss, uint32_t nrs){
     }
     return res;
 }
+
+void printVector(uint8_t *vector, uint8_t size){
+    for (int i = 0; i < size; i++)
+    {
+        printf("%d ", *(vector+i));
+    }
+    printf("\n");
+}
+
+/**
+int main(int argc, char const *argv[])
+{
+    uint8_t **matrix = malloc(3*sizeof(uint8_t*));
+    uint8_t a[] = {1, 2, 4};
+    uint8_t b[] = {4,5, 6};
+    uint8_t c[] = {7,5,9};
+    uint8_t res1[] = {1,2};
+    uint8_t res2[] = {10,15};
+    uint8_t res3[] = {14,16};
+    uint8_t **d = malloc(3*sizeof(uint8_t *));
+    *d = res1;
+    *(d+1) = res2;
+    *(d+2) = res3;
+    *matrix = a;
+    *(matrix +1) = b;
+    *(matrix + 2) = c;
+    gf_256_gaussian_elimination(matrix,d, 2, 3);
+    printMatrix(d, 3, 2);
+    printMatrix(matrix, 3, 3);
+    free(matrix);
+    free(d);
+    return 0;
+}*/

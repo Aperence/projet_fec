@@ -17,6 +17,10 @@ clean:
 	@rm -f fec
 	@rm -f ./bin/*
 
+#new: src/system.o src/tinymt32.o
+#	$(CC) $(INCLUDE_HEADERS_DIRECTORY) -o ./bin/$@ $^
+#	./bin/$@
+
 test_tinymn32: ./tests/test_tinymt32.o ./src/tinymt32.o
 	$(CC) $(INCLUDE_HEADERS_DIRECTORY) $(INCLUDE_CUNIT) $(LINK_CUNIT) -o ./bin/$@ $^ -lcunit
 	./bin/$@

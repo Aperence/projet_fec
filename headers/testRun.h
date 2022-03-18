@@ -1,4 +1,4 @@
 #ifndef MAINTEST
 #define MAINTEST
-#define MULTIPLE 1
+#define MULTIPLE 0
 #endif // !MAINTEST
