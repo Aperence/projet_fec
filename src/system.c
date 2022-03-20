@@ -8,9 +8,9 @@
 #include <limits.h>
 #include <inttypes.h>
 #include <stdbool.h>
-#include "system.h"
-#include "gf256_tables.h"
-#include "tinymt32.h"
+#include "../headers/system.h"
+#include "../headers/gf256_tables.h"
+#include "../headers/tinymt32.h"
 
 
 void gf_256_full_add_vector(uint8_t *symbol_1, uint8_t *symbol_2, uint32_t symbol_size){
@@ -70,20 +70,24 @@ void gf_256_gaussian_elimination(uint8_t **A, uint8_t **B, uint32_t symbol_size,
        [ 0  d ]
     */
     //backward reduction
+    uint8_t *temp = malloc(sizeof(uint8_t)*symbol_size);
     for (int i = system_size-1; i >=0 ; i--)
     {
         for (int j = i-1; j >=0 ; j--)
         {
-            factor = gf256_mul_table[*(*(A+j)+i)][gf256_inv_table[*(*(A+i)+i)]];
-            *(*(A+j)+i) = *(*(A+j)+i) ^ gf256_mul_table[*(*(A+i)+i)][factor];
-
-            gf_256_mul_vector(*(B+i), factor, symbol_size);
-            gf_256_full_add_vector(*(B+j), *(B+i), symbol_size);
+            if (*(*(A+j)+i) != 0){
+                memcpy(temp, *(B+i), symbol_size * sizeof(u_int8_t));
+                factor = gf256_mul_table[*(*(A+j)+i)][gf256_inv_table[*(*(A+i)+i)]];
+                *(*(A+j)+i) = (*(*(A+j)+i)) ^ gf256_mul_table[*(*(A+i)+i)][factor];
+                gf_256_mul_vector(temp, factor, symbol_size);
+                gf_256_full_add_vector(*(B+j), temp, symbol_size);
+            } 
         }
         factor = gf256_inv_table[*(*(A+i)+i)];
         *(*(A+i)+i) = gf256_mul_table[*(*(A+i)+i)][factor];
         gf_256_mul_vector(*(B+i), factor, symbol_size);
     }
+    free(temp);
 }
 
 uint8_t **gen_coefs(uint32_t seed, uint32_t nss, uint32_t nrs){
@@ -108,34 +112,30 @@ uint8_t **gen_coefs(uint32_t seed, uint32_t nss, uint32_t nrs){
 }
 
 void printVector(uint8_t *vector, uint8_t size){
+    printf("[ ");
     for (int i = 0; i < size; i++)
     {
         printf("%d ", *(vector+i));
     }
-    printf("\n");
+    printf(" ]\n");
 }
 
 /**
 int main(int argc, char const *argv[])
 {
-    uint8_t **matrix = malloc(3*sizeof(uint8_t*));
-    uint8_t a[] = {1, 2, 4};
-    uint8_t b[] = {4,5, 6};
-    uint8_t c[] = {7,5,9};
-    uint8_t res1[] = {1,2};
-    uint8_t res2[] = {10,15};
-    uint8_t res3[] = {14,16};
-    uint8_t **d = malloc(3*sizeof(uint8_t *));
-    *d = res1;
-    *(d+1) = res2;
-    *(d+2) = res3;
-    *matrix = a;
-    *(matrix +1) = b;
-    *(matrix + 2) = c;
-    gf_256_gaussian_elimination(matrix,d, 2, 3);
-    printMatrix(d, 3, 2);
-    printMatrix(matrix, 3, 3);
-    free(matrix);
-    free(d);
-    return 0;
+
+    const int size = 5;
+    uint8_t **A = gen_coefs(14, size, size);
+    uint8_t **B = gen_coefs(14, size, size);
+
+    gf_256_gaussian_elimination(A, B, size, size);
+    
+
+    for (int i = 0; i < size; i++)
+    {
+        free(*(A+i));
+        free(*(B+i));
+    }
+    free(A);
+    free(B);
 }*/

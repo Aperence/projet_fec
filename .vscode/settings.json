@@ -1,7 +1,7 @@
 {
     "files.associations": {
-        "basic.h": "c",
+        "system.h": "c",
         "tinymt32.h": "c",
-        "test_tinymt32.h": "c"
+        "gf256_tables.h": "c"
     }
 }

@@ -32,6 +32,19 @@ void test_mult_full_vector(){
     return;
 }
 
+void test_inv_full_vector(){
+    uint8_t a = 4;
+    uint8_t inv = gf256_inv_table[a];
+    uint8_t v[] = {4,3,2,1,5};
+    uint8_t expected[] = {1, gf256_mul_table[3][inv], gf256_mul_table[2][inv], gf256_mul_table[1][inv], gf256_mul_table[5][inv]};
+    gf_256_inv_vector(v, a, 5);
+    for (int i = 0; i < 5; i++)
+    {
+        CU_ASSERT_EQUAL(*(v+i), expected[i]);
+    }
+    return;
+}
+
 void test_random_coeff_generation(){
     int size = 31;
     uint8_t expected_res[] = {
@@ -50,12 +63,98 @@ void test_random_coeff_generation(){
     return;
 }
 
+void test_gaussian_reduction_fixed(){
+    /*     
+    [171  55]       [146 217 107]
+    [ 61 143]       [ 42  80 157]
+
+    Sol
+    [  1  0  ]      [112 114 111]
+    [  0  1  ]      [109 109 105]
+     */
+    uint8_t **A = malloc(2*sizeof(uint8_t *));
+    uint8_t A1[] = {171, 55};
+    uint8_t A2[] = {61, 143};
+    *A = A1;
+    *(A+1) = A2;
+
+    uint8_t **B = malloc(2*sizeof(uint8_t *));
+    uint8_t B1[] = {146, 217, 107};
+    uint8_t B2[] = {42, 80, 157};
+    *B = B1;
+    *(B+1) = B2;
+
+    uint8_t **expected = malloc(2*sizeof(uint8_t *));
+    uint8_t expected1[] = {112, 114, 111};
+    uint8_t expected2[] = {109, 109, 105};
+    *expected = expected1;
+    *(expected+1) = expected2;
+
+    gf_256_gaussian_elimination(A, B, 3, 2);
+
+    for (int i = 0; i < 2; i++)
+    {
+        for (int j = 0; j < 2; j++)
+        {
+            if (i==j){
+                CU_ASSERT_EQUAL(*(*(A+i)+j), 1);
+            }else{
+                CU_ASSERT_EQUAL(*(*(A+i)+j), 0);
+            }
+        }
+
+        for (int j = 0; j < 3; j++)
+        {
+            CU_ASSERT_EQUAL(*(*(B+i)+j), *(*(expected+i)+j));
+        }
+        
+    }
+    
+    free(A);
+    free(B);
+    free(expected);
+}
+
+void test_gaussian_reduction_bigger(){
+    const int size = 5;
+    uint8_t **A = gen_coefs(14, size, size);
+    uint8_t **B = gen_coefs(14, size, size);
+
+    gf_256_gaussian_elimination(A, B, size, size);
+
+    for (int i = 0; i < size; i++)
+    {
+        for (int j = 0; j < size; j++)
+        {
+            if (i==j){
+                CU_ASSERT_EQUAL(*(*(B+i)+j), 1);
+                CU_ASSERT_EQUAL(*(*(A+i)+j), 1);
+            }else{
+                CU_ASSERT_EQUAL(*(*(B+i)+j), 0);
+                CU_ASSERT_EQUAL(*(*(A+i)+j), 0);
+            }
+        }
+    }
+    
+
+    for (int i = 0; i < size; i++)
+    {
+        free(*(A+i));
+        free(*(B+i));
+    }
+    free(A);
+    free(B);
+}
+
 void addSuiteSystem(){
     printf("Loaded System !\n");
     CU_pSuite suite = CU_add_suite("system", 0, 0);
     CU_add_test(suite, "test full add vector", test_add_full_vector);
     CU_add_test(suite, "test full mult vector", test_mult_full_vector);
+    CU_add_test(suite, "test full inv vector", test_inv_full_vector);
     CU_add_test(suite, "correct_coeffs", test_random_coeff_generation);
+    CU_add_test(suite, "Basic gaussian reduction", test_gaussian_reduction_fixed);
+    CU_add_test(suite, "Bigger gaussian reduction", test_gaussian_reduction_bigger);
 }
 
 #if MULTIPLE
