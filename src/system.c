@@ -20,6 +20,15 @@ void gf_256_full_add_vector(uint8_t *symbol_1, uint8_t *symbol_2, uint32_t symbo
     }
 }
 
+uint8_t *gf_256_full_add_vector_ret(uint8_t *symbol_1, uint8_t *symbol_2, uint32_t symbol_size){
+    uint8_t *ret = malloc(sizeof(uint8_t)*symbol_size);
+    for (int i = 0; i < symbol_size; i++)
+    {
+        *(ret+i) = *(symbol_1+i) ^ *(symbol_2 + i);
+    }
+    return ret;
+}
+
 void gf_256_mul_vector(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_size){
     for (int i = 0; i < symbol_size; i++)
     {
@@ -27,8 +36,21 @@ void gf_256_mul_vector(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_size){
     }
 }
 
+uint8_t *gf_256_mul_vector_ret(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_size){
+    uint8_t *ret = malloc(sizeof(uint8_t)*symbol_size);
+    for (int i = 0; i < symbol_size; i++)
+    {
+        *(ret+i) = gf256_mul_table[*(symbol_1+i)][coef];
+    }
+    return ret;
+}
+
 void gf_256_inv_vector(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_size){
     gf_256_mul_vector(symbol_1, gf256_inv_table[coef], symbol_size);
+}
+
+uint8_t *gf_256_inv_vector_ret(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_size){
+    return gf_256_mul_vector_ret(symbol_1, gf256_inv_table[coef], symbol_size);
 }
 
 
@@ -121,6 +143,7 @@ void printVector(uint8_t *vector, uint8_t size){
 }
 
 /**
+ * Exemple d'utilisation
 int main(int argc, char const *argv[])
 {
 

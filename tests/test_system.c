@@ -1,48 +1,96 @@
 #include <CUnit/Basic.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "gf256_tables.h"
 #include "test_system.h"
 #include "testRun.h"
 #include "system.h"
 
 void test_add_full_vector(){
-    uint8_t v[] = {1,2,3,4,5};
-    uint8_t u[] = {4,3,2,1,5};
-    uint8_t u_copy[] = {4,3,2,1,5};
-    uint8_t expected[] = {4^1,3^2, 2^3 , 1^4, 0};
-    gf_256_full_add_vector(v, u, 5);
-    for (int i = 0; i < 5; i++)
+    uint32_t n = 1000;
+    srand( time( NULL ) );
+    uint8_t *v = malloc(n*sizeof(uint8_t));
+    uint8_t *u = malloc(n*sizeof(uint8_t));
+    uint8_t *u_copy = malloc(n*sizeof(uint8_t));
+    uint8_t *exp = malloc(n*sizeof(uint8_t));
+    for (uint32_t i = 0; i < n; i++)
     {
-        CU_ASSERT_EQUAL(*(v+i), expected[i]);
-        CU_ASSERT_EQUAL(*(u+i), *(u_copy+i));
+        uint8_t r1 = rand() % 256;
+        uint8_t r2 = rand() % 256;
+        *(v+i) = r1;
+        *(u+i) = r2;
+        *(u_copy+i) = r2;
+        *(exp+i) = r1 ^ r2;
     }
-    return;
+
+    gf_256_full_add_vector(v, u, n);
+
+    for (uint32_t i = 0; i < n; i++)
+    {
+        CU_ASSERT_EQUAL(*(exp+i), *(v+i));
+    }
+    
+    free(exp);
+    free(u);
+    free(v);
+    free(u_copy);
 }
 
 void test_mult_full_vector(){
-    uint8_t a = 15;
-    uint8_t v[] = {4,3,2,1,5};
-    uint8_t expected[] = {gf256_mul_table[4][15], gf256_mul_table[3][15], gf256_mul_table[2][15], gf256_mul_table[1][15], gf256_mul_table[5][15]};
-    gf_256_mul_vector(v, a, 5);
-    for (int i = 0; i < 5; i++)
+    uint32_t n = 1000;
+    uint32_t m_times = 25;
+    srand( time( NULL ) );
+    uint8_t *v = malloc(n*sizeof(uint8_t));
+    uint8_t *exp = malloc(n*sizeof(uint8_t));
+    for (uint32_t j = 0; j < m_times; j++)
     {
-        CU_ASSERT_EQUAL(*(v+i), expected[i]);
+        uint8_t coef = rand() % 256;
+        for (uint32_t i = 0; i < n; i++)
+        {
+            uint8_t r1 = rand() % 256;
+            *(v+i) = r1;
+            *(exp+i) = gf256_mul_table[r1][coef];
+        }
+
+        gf_256_mul_vector(v, coef, n);
+
+        for (uint32_t i = 0; i < n; i++)
+        {
+            CU_ASSERT_EQUAL(*(exp+i), *(v+i));
+        }
     }
-    return;
+    
+    free(exp);
+    free(v);
 }
 
 void test_inv_full_vector(){
-    uint8_t a = 4;
-    uint8_t inv = gf256_inv_table[a];
-    uint8_t v[] = {4,3,2,1,5};
-    uint8_t expected[] = {1, gf256_mul_table[3][inv], gf256_mul_table[2][inv], gf256_mul_table[1][inv], gf256_mul_table[5][inv]};
-    gf_256_inv_vector(v, a, 5);
-    for (int i = 0; i < 5; i++)
+    uint32_t n = 1000;
+    uint32_t m_times = 25;
+    srand( time( NULL ) );
+    uint8_t *v = malloc(n*sizeof(uint8_t));
+    uint8_t *exp = malloc(n*sizeof(uint8_t));
+    for (uint32_t j = 0; j < m_times; j++)
     {
-        CU_ASSERT_EQUAL(*(v+i), expected[i]);
+        uint8_t coef = rand() % 256;
+        for (uint32_t i = 0; i < n; i++)
+        {
+            uint8_t r1 = rand() % 256;
+            *(v+i) = r1;
+            *(exp+i) = gf256_mul_table[r1][gf256_inv_table[coef]];
+        }
+
+        gf_256_inv_vector(v, coef, n);
+
+        for (uint32_t i = 0; i < n; i++)
+        {
+            CU_ASSERT_EQUAL(*(exp+i), *(v+i));
+        }
     }
-    return;
+    
+    free(exp);
+    free(v);
 }
 
 void test_random_coeff_generation(){
@@ -71,6 +119,8 @@ void test_gaussian_reduction_fixed(){
     Sol
     [  1  0  ]      [112 114 111]
     [  0  1  ]      [109 109 105]
+
+    Taken from the python implementation
      */
     uint8_t **A = malloc(2*sizeof(uint8_t *));
     uint8_t A1[] = {171, 55};
@@ -116,9 +166,10 @@ void test_gaussian_reduction_fixed(){
 }
 
 void test_gaussian_reduction_bigger(){
-    const int size = 5;
-    uint8_t **A = gen_coefs(14, size, size);
-    uint8_t **B = gen_coefs(14, size, size);
+    const int size = 16;   // do not exceed 15/16 => because then random number aren't any more and lines become linearly dependant
+    const int seed = 14;
+    uint8_t **A = gen_coefs(seed, size, size);
+    uint8_t **B = gen_coefs(seed, size, size);
 
     gf_256_gaussian_elimination(A, B, size, size);
 

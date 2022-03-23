@@ -34,6 +34,15 @@ void printVector(uint8_t *vector, uint8_t size);
 void gf_256_full_add_vector(uint8_t *symbol_1, uint8_t *symbol_2, uint32_t symbol_size);
 
 /**
+ * @brief Return a new vector containint the addition of the vector symbol_1 and symbol_2
+ * @param symbol_1 : The first vector to add
+ * @param symbol_2 : The second vector to add
+ * @param symbol_size : The size of symbol_1 and symbol_2
+ * @return A new vector of size symbol_size containing the addition of symbol_1 and symbol_2
+ */
+uint8_t *gf_256_full_add_vector_ret(uint8_t *symbol_1, uint8_t *symbol_2, uint32_t symbol_size);
+
+/**
  *
  * Multiply a vector by a coefficient in a Galois Field 256 in place
  * @param symbol: the symbol to multiply
@@ -43,6 +52,15 @@ void gf_256_full_add_vector(uint8_t *symbol_1, uint8_t *symbol_2, uint32_t symbo
 void gf_256_mul_vector(uint8_t *symbol, uint8_t coef, uint32_t symbol_size);
 
 /**
+ * @brief Return a new vector containint the multiplication of the vector symbol_1 by coef
+ * @param symbol_1 : The vector to mutiply
+ * @param coef : The multiplication coefficient
+ * @param symbol_size : The size of symbol_1 
+ * @return A new vector containing the multiplication of symbol_1 by coef and of size symbol_size
+ */
+uint8_t *gf_256_mul_vector_ret(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_size);
+
+/**
  *
  * Divide a vector in a Galois Field 256 by a coefficient in place
  * @param symbol: the symbol to add
@@ -50,6 +68,15 @@ void gf_256_mul_vector(uint8_t *symbol, uint8_t coef, uint32_t symbol_size);
  * @param symbol_size: size of the two symbols (of the same size!)
  */
 void gf_256_inv_vector(uint8_t *symbol, uint8_t coef, uint32_t symbol_size);
+
+/**
+ * @brief Return a new vector containint the division of the vector symbol_1 by coef
+ * @param symbol_1 : The vector to divide
+ * @param coef : The divisor coefficient
+ * @param symbol_size : The size of symbol_1 
+ * @return A new vector containing the multiplication of symbol_1 by coef and of size symbol_size
+ */
+uint8_t *gf_256_inv_vector_ret(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_size);
 
 /**
  *
