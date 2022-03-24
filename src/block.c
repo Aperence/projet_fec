@@ -15,7 +15,7 @@ uint8_t verifySymbolLost(uint8_t *symb, uint32_t size){
     return 1;
 }
 
-uint8_t *verifyBlock(block_t block, uint32_t *nb_unk){ 
+uint8_t *verifyBlock(block_t block, uint32_t *nb_unk){
     uint8_t *s = malloc(sizeof(uint8_t)*block.size_block);
     *nb_unk = 0;
     for (uint32_t i = 0; i < block.size_block; i++)
