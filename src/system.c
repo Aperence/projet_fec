@@ -98,7 +98,7 @@ void gf_256_gaussian_elimination(uint8_t **A, uint8_t **B, uint32_t symbol_size,
         for (int j = i-1; j >=0 ; j--)
         {
             if (*(*(A+j)+i) != 0){
-                memcpy(temp, *(B+i), symbol_size * sizeof(u_int8_t));
+                memcpy(temp, *(B+i), symbol_size * sizeof(uint8_t));
                 factor = gf256_mul_table[*(*(A+j)+i)][gf256_inv_table[*(*(A+i)+i)]];
                 *(*(A+j)+i) = (*(*(A+j)+i)) ^ gf256_mul_table[*(*(A+i)+i)][factor];
                 gf_256_mul_vector(temp, factor, symbol_size);
