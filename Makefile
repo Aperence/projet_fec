@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -Werror -g
+CFLAGS=-Wall -Werror -g -std=c99
 LIBS=-lcunit -lpthread
 INCLUDE_HEADERS_DIRECTORY=-Iheaders
 INCLUDE_CUNIT = -I$(HOME)/local/include
