@@ -38,4 +38,8 @@ check:
 	@make tests
 	valgrind ./bin/testing
 
+run:
+	$(CC) $(INCLUDE_HEADERS_DIRECTORY) -o open ./src/open_file.c
+	./open
+
 .PHONY: clean tests
