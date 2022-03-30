@@ -2,6 +2,13 @@
     "files.associations": {
         "system.h": "c",
         "tinymt32.h": "c",
-        "gf256_tables.h": "c"
+        "gf256_tables.h": "c",
+        "system_error": "c",
+        "portable_endian.h": "c",
+        "endian.h": "c",
+        "message.h": "c",
+        "byteswap.h": "c",
+        "*.tcc": "c",
+        "algorithm": "c"
     }
 }

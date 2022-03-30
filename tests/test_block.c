@@ -6,7 +6,6 @@
 #include "test_block.h"
 #include "testRun.h"
 #include "block.h"
-#include "stack.h"
 
 void testSymbolLost(){
     srand( time( NULL ) );
@@ -68,7 +67,7 @@ void testBlockLost(){
     }
     block_t block = {n, 0, m, list_symbol};
     uint32_t lost;
-    uint8_t *res = verifyBlock(block, &lost);
+    uint8_t *res = verifyBlock(&block, &lost);
 
     for (int i = 0; i < n; i++)
     {

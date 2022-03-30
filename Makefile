@@ -1,12 +1,12 @@
-CC=gcc
-CFLAGS=-Wall -Werror -g -std=c99
-LIBS=-lcunit -lpthread
+CC=gcc 
+CFLAGS=-Wall -Werror -g -std=gnu99
+LIBS=-lpthread
 INCLUDE_HEADERS_DIRECTORY=-Iheaders
 INCLUDE_CUNIT = -I$(HOME)/local/include
 LINK_CUNIT = -L$(HOME)/local/lib
 
-fec: main.c     # add your other object files needed to compile your program here. !! The ordering is important !! if file_a.o depends on file_b.o, file_a.o must be placed BEFORE file_b.o in the list !
-	$(CC) $(INCLUDE_HEADERS_DIRECTORY) $(CFLAGS) -o $@ $^ $(LIBS)    # this will run the following command: gcc -Wall -Werror -g -o kmeans src/distance.o other_object_filespresent_above.o ... -lcunit -lpthread
+fec: main.o  ./src/block.o  ./src/message.o  ./src/system.o  ./src/tinymt32.o
+	$(CC) $(INCLUDE_HEADERS_DIRECTORY) $(CFLAGS) -o $@ $^ $(LIBS)
 
 %.o: %.c
 	@$(CC) $(INCLUDE_HEADERS_DIRECTORY) $(INCLUDE_CUNIT) $(CFLAGS) -o $@ -c $<
@@ -16,6 +16,8 @@ clean:
 	@rm -f tests/*.o
 	@rm -f fec
 	@rm -f ./bin/*
+	@rm -f ./*.o
+	@rm -f ./testing
 
 #new: src/system.o src/tinymt32.o
 #	$(CC) $(INCLUDE_HEADERS_DIRECTORY) -o ./bin/$@ $^ -g
@@ -30,16 +32,23 @@ test_system:  ./src/tinymt32.o tests/test_system.o src/system.o
 	./bin/$@
 
 tests: ./tests/testRun.o     ./tests/test_tinymt32.o ./src/tinymt32.o       tests/test_system.o src/system.o     tests/test_block.o  src/block.o
-	$(CC) $(INCLUDE_HEADERS_DIRECTORY) $(INCLUDE_CUNIT) $(LINK_CUNIT) -o ./bin/testing $^ -lcunit
-	./bin/testing
+	$(CC) $(INCLUDE_HEADERS_DIRECTORY) $(INCLUDE_CUNIT) $(LINK_CUNIT) -o ./testing $^ -lcunit
+	./testing
 
 check:
-	cppcheck ./src/system.c
+	@cppcheck ./src/system.c
+	@cppcheck ./src/block.c
+	@cppcheck ./src/message.c
+	@cppcheck ./src/tinymt32.c
+	@cppcheck ./main.c
 	@make tests
-	valgrind ./bin/testing
+	@make
+	@valgrind ./testing
+	@valgrind ./fec ./binary_exemple -f here.txt
+	@make clean
 
-run:
-	$(CC) $(INCLUDE_HEADERS_DIRECTORY) -o open ./src/open_file.c
+run:  ./src/block.o  ./src/system.o ./src/message.o  ./src/tinymt32.o
+	$(CC) $(CCFLAGS) $(INCLUDE_HEADERS_DIRECTORY) -o open $^
 	./open
 
 .PHONY: clean tests

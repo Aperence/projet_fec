@@ -112,14 +112,8 @@ void gf_256_gaussian_elimination(uint8_t **A, uint8_t **B, uint32_t symbol_size,
     free(temp);
 }
 
-uint8_t **gen_coefs(uint32_t seed, uint32_t nss, uint32_t nrs){
+uint8_t **gen_coefs(tinymt32_t prng, uint32_t nss, uint32_t nrs){
     uint8_t **res = malloc(sizeof(uint8_t *)*nss);
-    tinymt32_t prng;
-    memset(&prng, 0, sizeof(tinymt32_t));
-    prng.mat1 = 0x8f7011ee;
-    prng.mat2 = 0xfc78ff1f;
-    prng.tmat = 0x3793fdff;
-    tinymt32_init(&prng, seed);
     for (int i = 0; i < nss; i++)
     {
         uint8_t *temp = malloc(sizeof(uint8_t)*nrs);

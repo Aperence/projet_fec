@@ -2,6 +2,7 @@
 #define SYSTEM_H
 
 #include <stdint.h>
+#include "tinymt32.h"
 
 typedef struct
 {
@@ -96,6 +97,6 @@ void gf_256_gaussian_elimination(uint8_t **A, uint8_t **b, uint32_t symbol_size,
  * @param nrs: number of repair symbols in a block
  * @return: a nss * nrs array of coefficients
  */
-uint8_t **gen_coefs(uint32_t seed, uint32_t nss, uint32_t nrs);
+uint8_t **gen_coefs(tinymt32_t prng, uint32_t nss, uint32_t nrs);
 
 #endif /* SYSTEM_H */
