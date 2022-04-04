@@ -37,8 +37,8 @@ void testSymbolLost(){
 
 void testBlockLost(){
     srand( time( NULL ) );
-    int n = 10000;
-    int m = 500;
+    int n = 10000;  // size of block
+    int m = 500;    // size of symbol
     uint8_t **list_symbol = malloc(n*sizeof(uint8_t*));
     uint8_t *expected = malloc(n*sizeof(uint8_t));
     uint32_t nb_unk = 0;
@@ -65,9 +65,9 @@ void testBlockLost(){
         }
         
     }
-    block_t block = {n, 0, m, list_symbol};
+    block_t block = {n, list_symbol};
     uint32_t lost;
-    uint8_t *res = verifyBlock(&block, &lost);
+    uint8_t *res = verifyBlock(&block, &lost, 0, m);
 
     for (int i = 0; i < n; i++)
     {

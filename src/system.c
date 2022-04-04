@@ -2,15 +2,12 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include <dirent.h>
-#include <errno.h>
-#include <getopt.h>
-#include <limits.h>
-#include <inttypes.h>
-#include <stdbool.h>
-#include "../headers/system.h"
-#include "../headers/gf256_tables.h"
-#include "../headers/tinymt32.h"
+#include "system.h"
+#include "gf256_tables.h"
+#include "tinymt32.h"
+#include "main.h"
+
+extern args_t args;
 
 
 void gf_256_full_add_vector(uint8_t *symbol_1, uint8_t *symbol_2, uint32_t symbol_size){
@@ -135,24 +132,3 @@ void printVector(uint8_t *vector, uint8_t size){
     }
     printf(" ]\n");
 }
-
-/**
- * Exemple d'utilisation
-int main(int argc, char const *argv[])
-{
-
-    const int size = 5;
-    uint8_t **A = gen_coefs(14, size, size);
-    uint8_t **B = gen_coefs(14, size, size);
-
-    gf_256_gaussian_elimination(A, B, size, size);
-    
-
-    for (int i = 0; i < size; i++)
-    {
-        free(*(A+i));
-        free(*(B+i));
-    }
-    free(A);
-    free(B);
-}*/

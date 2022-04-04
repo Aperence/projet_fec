@@ -4,12 +4,6 @@
 #include <stdint.h>
 #include "tinymt32.h"
 
-typedef struct
-{
-    // TODO
-} system_t;
-
-
 /**
  * Print a matrix of size n x m to the standard output
  * @param matrix : the matrix to print

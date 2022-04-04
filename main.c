@@ -20,6 +20,8 @@ typedef struct args
     bool verbose;
 } args_t;
 
+args_t args;
+
 char **filenames;   //list of filenames from which threads will consume
 uint32_t nextFile = 0;   // index of next file to be processed
 uint32_t numberFiles;
@@ -94,7 +96,6 @@ int parse_args(args_t *args, int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-    args_t args;
     int err = parse_args(&args, argc, argv);
 
     if (err == -1)
@@ -111,9 +112,17 @@ int main(int argc, char *argv[])
     // threads here
     while (nextFile < numberFiles)
     {
-        message_t *message = openFile(*(filenames + nextFile));
-        processBlock(message->listBlock, message->numberBlocks, message->seed);
-        printMessage(message);
+        
+        char *path = malloc(PATH_MAX);
+        strcpy(path, args.input_dir_path);
+        strcat(path, "/");
+        strcat(path, *(filenames + nextFile));
+        if (args.verbose){
+            printf(">>>>>> filename : %s\n", *(filenames + nextFile));
+            printf(">>>>>> path     : %s\n", path);
+        }
+        message_t *message = openFile(path);
+        processBlock(message->listBlock, message->numberBlocks, message->seed, message->size_redundance, message->size_symbol);
         writeToFile(args.output_stream, message, *(filenames+nextFile));
         free(*(filenames + nextFile));
         nextFile++;

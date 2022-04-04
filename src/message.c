@@ -13,12 +13,15 @@
 #include "block.h"
 #include "system.h"
 #include "portable_endian.h"
+#include "main.h"
+
+extern args_t args;
 
 
 void freeMessage(message_t *m){
     for (int i = 0; i < m->numberBlocks; i++)
     {
-        freeBlock(*(m->listBlock + i));
+        freeBlock(*(m->listBlock + i), m->size_redundance);
     }
     free(m->listBlock);
     free(m);
@@ -27,7 +30,7 @@ void freeMessage(message_t *m){
 void printMessage(message_t *m){
     for (int i = 0; i < m->numberBlocks; i++)
     {
-        printBlock(*(m->listBlock + i));
+        printBlock(*(m->listBlock + i), m->size_redundance, m->size_symbol);
     }
 }
 
@@ -53,11 +56,9 @@ char **readDir(DIR *directory, const char* directoryname, uint32_t *numberFiles)
     int i = 0;
     while ((entry = readdir(directory))){
         if (!strcmp(entry->d_name, "..") == 0 && !strcmp(entry->d_name, ".") == 0){
-            char *path = malloc(PATH_MAX);
-            strcpy(path, directoryname);
-            strcat(path, "/");
-            strcat(path, entry->d_name);
-            *(filenames + i) = path;
+            char *filename = malloc(256);
+            strcpy(filename, entry->d_name);
+            *(filenames + i) = filename;
             i++;
         }
     }
@@ -67,43 +68,40 @@ char **readDir(DIR *directory, const char* directoryname, uint32_t *numberFiles)
     return filenames;
 }
 
-block_t **makeBlockList(uint32_t numberBlocks, uint8_t *message, uint32_t block_size, uint32_t symbol_size, uint32_t redundance_size, uint32_t messageSize){
+block_t **makeBlockList(uint32_t numberBlocks, uint8_t *message, uint32_t block_size, uint32_t symbol_size, uint32_t redundance_size, uint32_t messageSize, uint32_t padding){
     block_t **ret = malloc(sizeof(block_t *)*numberBlocks);
+    uint32_t offset = 0;
     for (uint32_t i = 0; i < numberBlocks; i++) //iterate on blocks
     {
         uint8_t **listSymbol;
         uint32_t number_symbol = block_size+redundance_size;
         if (i == numberBlocks - 1){
-            number_symbol = (messageSize - (i*symbol_size*number_symbol)) / symbol_size;
-            if (((messageSize - (i*symbol_size*(block_size+redundance_size))) % symbol_size) != 0){
-                number_symbol++;
-            }
+                uint32_t lastBlockSize = ((messageSize) % ((block_size) * (symbol_size))) / symbol_size;
+                if (((messageSize) % ((block_size) * (symbol_size))) % symbol_size != 0) lastBlockSize++;
+                number_symbol = lastBlockSize + redundance_size;
         }
         listSymbol = malloc(number_symbol*sizeof(uint8_t *));
         for (uint32_t j = 0; j < number_symbol; j++) //iterate on symbols
         {
             uint8_t *symbol = malloc(symbol_size);
-            if (i== numberBlocks - 1 && j == number_symbol - 1 - redundance_size){ // last symbol of last block => add padding
-                memset(symbol, 0, symbol_size);
+            if (i == numberBlocks - 1 && j == number_symbol - 1 - redundance_size){ // last symbol of last block => add padding
+                memset(symbol, (uint8_t) 0, symbol_size);
+                memcpy(symbol, (void *) (message + offset), symbol_size);
+                offset += symbol_size;
+            }else{
+                memcpy(symbol, (void *) (message + offset), symbol_size);
+                offset += symbol_size;
             }
-            memcpy(symbol, (void *) (message + symbol_size*(block_size+redundance_size)*i + symbol_size*j), symbol_size);
             *(listSymbol+j) = symbol;
         }
 
         block_t *temp = malloc(sizeof(block_t));
         temp->size_block = number_symbol - redundance_size;
-        temp->size_redundance = redundance_size;
-        temp->size_symbol = symbol_size;
         temp->symb_list = listSymbol;
         *(ret+i) = temp;
     }
     return ret;
 }
-
-/*
-return -1 if file can't be openned
-
-*/
 
 message_t *openFile(const char *filename){
 
@@ -125,23 +123,32 @@ message_t *openFile(const char *filename){
     fread(&message_size, sizeof(uint64_t), 1, f);
     message_size = be64toh(message_size);
 
+    uint32_t lastBlockSize = (message_size) % ((block_size) * (symbol_size));
+    uint32_t lastSymbolSize = lastBlockSize % symbol_size;
+    uint32_t padding = symbol_size - lastSymbolSize;
 
-    printf("Seed: %d\nBlock : %d\nRedundance: %d\nSymbol: %d\nMessage: %ld\n", seed, block_size, redundance_size, symbol_size, message_size);
+    if (args.verbose){
+        printf("Seed: %d\nBlock : %d\nRedundance: %d\nSymbol: %d\nMessage: %ld\nPadding : %d\n", seed, block_size, redundance_size, symbol_size, message_size, padding);
+    }
     
     struct stat st;
     stat(filename, &st);
 
-    uint32_t numberBlocks = (st.st_size-24) / (( (block_size) + (redundance_size)) * (symbol_size));
+    uint32_t numberBlocks = (message_size) / ((block_size) * (symbol_size));
 
-    if ((st.st_size-24) % ( (block_size) + (redundance_size)) * (symbol_size) != 0){
+    if (((message_size) % ((block_size) * (symbol_size))) != 0){
         numberBlocks++;
+    }
+
+    if (args.verbose){
+        printf("Number blocks : %d\nLast Block size : %d\nLast symbol size : %d\nTotal size : %ld\n", numberBlocks, lastBlockSize, lastSymbolSize, message_size + redundance_size*numberBlocks*symbol_size );
     }
 
     uint8_t *fileMessage = malloc(st.st_size - 24);
     fread(fileMessage , 1, st.st_size - 24 , f);
     
-    block_t **blockList = makeBlockList(numberBlocks, fileMessage , block_size, symbol_size, redundance_size, st.st_size - 24);
-    
+    block_t **blockList = makeBlockList(numberBlocks, fileMessage , block_size, symbol_size, redundance_size, message_size, padding);
+ 
     free(fileMessage);
 
     message_t *message = malloc(sizeof(message_t));
@@ -150,7 +157,13 @@ message_t *openFile(const char *filename){
     message->messageSize = message_size;
     message->numberBlocks = numberBlocks;
     message->listBlock = blockList;
-
+    message->size_redundance = redundance_size;
+    message->size_symbol = symbol_size;
+    message->padding = padding;
+    
+    if (args.verbose){
+        printMessage(message);
+    }
     if (fclose(f)!=0) {
         freeMessage(message); 
         return NULL;
@@ -168,42 +181,23 @@ void writeToFile(FILE *outFile, message_t *message, const char*filename){
 
     for (uint32_t i = 0; i < message->numberBlocks; i++)
     {
-        for (uint32_t j = 0; j < (*(message->listBlock+i))->size_block ; j++)
+        block_t *b = *(message->listBlock+i);
+        for (uint32_t j = 0; j < b->size_block ; j++)
         {
-            fwrite(*((*(message->listBlock+i))->symb_list + j), 1, (*(message->listBlock+i))->size_symbol , outFile);
-            free(*((*(message->listBlock+i))->symb_list + j));
+            if (i==message->numberBlocks - 1 && j == b->size_block - 1){
+                fwrite(*(b->symb_list + j), 1, message->size_symbol - message->padding , outFile);
+            }else{
+                fwrite(*(b->symb_list + j), 1, message->size_symbol , outFile);
+            }
+            free(*(b->symb_list + j));
         }
-        for (uint32_t j = 0; j < (*(message->listBlock+i))->size_redundance; j++)
+        for (uint32_t j = 0; j < message->size_redundance; j++)
         {
-            free(*((*(message->listBlock+i))->symb_list + (*(message->listBlock+i))->size_block + j));   //free the redundance symbols
+            free(*(b->symb_list + b->size_block + j));   //free the redundance symbols
         }
-        free((*(message->listBlock+i))->symb_list);
-        free(*(message->listBlock+i));
+        free(b->symb_list);
+        free(b);
     }
     free(message->listBlock);
     free(message);
 }
-
-/**
-int main(int argc, char const *argv[])
-{
-    message_t *m = openFile("./binary_exemple/mediumNoLost.bin");
-    for (int i = 0; i < m->numberBlocks; i++)
-    {
-        printf("Block : %d\n", i);
-        printBlock(*(m->listBlock + i));
-        freeBlock(*(m->listBlock + i));
-    }
-    free(m->listBlock);
-    free(m);
-
-    readDir("./binary_exemple");
-    printf("%d\n", numberFiles);
-    for (int i = 0; i < numberFiles; i++)
-    {
-        printf("%s\n", *(filenames + i));
-        free(*(filenames + i));
-    }
-    free(filenames);
-    return 0;
-}*/
