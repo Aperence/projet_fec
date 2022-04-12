@@ -29,12 +29,49 @@ void test_add_full_vector(){
     for (uint32_t i = 0; i < n; i++)
     {
         CU_ASSERT_EQUAL(*(exp+i), *(v+i));
+        CU_ASSERT_EQUAL(*(u+i), *(u_copy+i));
     }
     
     free(exp);
     free(u);
     free(v);
     free(u_copy);
+}
+
+void test_add_full_vector_ret(){
+    uint32_t n = 1000;
+    srand( time( NULL ) );
+    uint8_t *v = malloc(n*sizeof(uint8_t));
+    uint8_t *u = malloc(n*sizeof(uint8_t));
+    uint8_t *v_copy = malloc(n*sizeof(uint8_t));
+    uint8_t *u_copy = malloc(n*sizeof(uint8_t));
+    uint8_t *exp = malloc(n*sizeof(uint8_t));
+    for (uint32_t i = 0; i < n; i++)
+    {
+        uint8_t r1 = rand() % 256;
+        uint8_t r2 = rand() % 256;
+        *(v+i) = r1;
+        *(u+i) = r2;
+        *(v_copy+i) = r1;
+        *(u_copy+i) = r2;
+        *(exp+i) = r1 ^ r2;
+    }
+
+    uint8_t *res = gf_256_full_add_vector_ret(v, u, n);
+
+    for (uint32_t i = 0; i < n; i++)
+    {
+        CU_ASSERT_EQUAL(*(res+i), *(exp+i));
+        CU_ASSERT_EQUAL(*(v+i), *(v_copy+i));
+        CU_ASSERT_EQUAL(*(u+i), *(u_copy+i));
+    }
+    
+    free(exp);
+    free(u);
+    free(v);
+    free(u_copy);
+    free(v_copy);
+    free(res);
 }
 
 void test_mult_full_vector(){
@@ -65,6 +102,40 @@ void test_mult_full_vector(){
     free(v);
 }
 
+void test_mult_full_vector_ret(){
+    uint32_t n = 1000;
+    uint32_t m_times = 25;
+    srand( time( NULL ) );
+    uint8_t *v = malloc(n*sizeof(uint8_t));
+    uint8_t *v_copy = malloc(n*sizeof(uint8_t));
+    uint8_t *exp = malloc(n*sizeof(uint8_t));
+    for (uint32_t j = 0; j < m_times; j++)
+    {
+        uint8_t coef = rand() % 256;
+        for (uint32_t i = 0; i < n; i++)
+        {
+            uint8_t r1 = rand() % 256;
+            *(v+i) = r1;
+            *(v_copy+i) = r1;
+            *(exp+i) = gf256_mul_table[r1][coef];
+        }
+
+        uint8_t *res = gf_256_mul_vector_ret(v, coef, n);
+
+        for (uint32_t i = 0; i < n; i++)
+        {
+            CU_ASSERT_EQUAL(*(exp+i), *(res+i));
+            CU_ASSERT_EQUAL(*(v_copy+i), *(v+i));
+        }
+
+        free(res);
+    }
+    
+    free(exp);
+    free(v);
+    free(v_copy);
+}
+
 void test_inv_full_vector(){
     uint32_t n = 1000;
     uint32_t m_times = 25;
@@ -91,6 +162,40 @@ void test_inv_full_vector(){
     
     free(exp);
     free(v);
+}
+
+void test_inv_full_vector_ret(){
+    uint32_t n = 1000;
+    uint32_t m_times = 25;
+    srand( time( NULL ) );
+    uint8_t *v = malloc(n*sizeof(uint8_t));
+    uint8_t *v_copy = malloc(n*sizeof(uint8_t));
+    uint8_t *exp = malloc(n*sizeof(uint8_t));
+    for (uint32_t j = 0; j < m_times; j++)
+    {
+        uint8_t coef = rand() % 256;
+        for (uint32_t i = 0; i < n; i++)
+        {
+            uint8_t r1 = rand() % 256;
+            *(v+i) = r1;
+            *(v_copy+i) = r1;
+            *(exp+i) = gf256_mul_table[r1][gf256_inv_table[coef]];
+        }
+
+        uint8_t *res = gf_256_inv_vector_ret(v, coef, n);
+
+        for (uint32_t i = 0; i < n; i++)
+        {
+            CU_ASSERT_EQUAL(*(exp+i), *(res+i));
+            CU_ASSERT_EQUAL(*(v_copy+i), *(v+i));
+        }
+
+        free(res);
+    }
+    
+    free(exp);
+    free(v);
+    free(v_copy);
 }
 
 void test_random_coeff_generation(){
@@ -217,8 +322,11 @@ void addSuiteSystem(){
     printf("Loaded System !\n");
     CU_pSuite suite = CU_add_suite("system", 0, 0);
     CU_add_test(suite, "test full add vector", test_add_full_vector);
+    CU_add_test(suite, "test full add vector return", test_add_full_vector_ret);
     CU_add_test(suite, "test full mult vector", test_mult_full_vector);
+    CU_add_test(suite, "test full mult vector return", test_mult_full_vector_ret);
     CU_add_test(suite, "test full inv vector", test_inv_full_vector);
+    CU_add_test(suite, "test full inv vector return", test_inv_full_vector_ret);
     CU_add_test(suite, "correct_coeffs", test_random_coeff_generation);
     CU_add_test(suite, "Basic gaussian reduction", test_gaussian_reduction_fixed);
     CU_add_test(suite, "Bigger gaussian reduction", test_gaussian_reduction_bigger);

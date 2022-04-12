@@ -30,6 +30,21 @@ The files in ./tests are all run by the main test file testRun.c. They each impl
 |File       | Function                                         |
 |:----------|:------------------------------------------------:|
 |[test_block.c](https://forge.uclouvain.be/p3-2022/group-v/lepl-1503-2022-skeleton-group-v-2/-/blob/main/tests/test_block.c)    | Tests to check if block has lost symbols (with lost indexes) + check if symbol is lost
-|[test_message.c](https://forge.uclouvain.be/p3-2022/group-v/lepl-1503-2022-skeleton-group-v-2/-/blob/main/tests/test_system.c)  | TO DO
+|[test_message.c](https://forge.uclouvain.be/p3-2022/group-v/lepl-1503-2022-skeleton-group-v-2/-/blob/main/tests/test_message.c)  | Tests to check if the output file contains the expected content
 |[test_system.c](https://forge.uclouvain.be/p3-2022/group-v/lepl-1503-2022-skeleton-group-v-2/-/blob/main/tests/test_system.c)   | Tests for gaussian reduction + vector operations
 |[test_tinymt32.c](https://forge.uclouvain.be/p3-2022/group-v/lepl-1503-2022-skeleton-group-v-2/-/blob/main/tests/test_tinymt32.c) | Tests for random generation (already given at start of project)
+
+## Execution Speed test
+
+The file executionSpeed.sh is used to mesure the time taken by our program *fec* to run. To be able to run it, install the `bc` extension for bash using the following command in terminal : 
+```bash
+$ sudo apt install bc
+```
+
+You can then launch the execution time test by launching the following command in this directory : 
+
+```bash
+./executionSpeed.sh
+```
+
+For example, the average speed we mesured for our program to run was ~ 9.817 ms.

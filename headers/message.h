@@ -37,10 +37,9 @@ void printMessage(message_t *m);
  * 
  * @param directory : An open directory 
  * @param directoryname : The name of the directory
- * @param numberFiles : An int pointer used to stock the number of files in directory
  * @return An array of the list of names of files contained in directory
  */
-char **readDir(DIR *directory, const char* directoryname, uint32_t *numberFiles);
+char **readDir(DIR *directory, const char* directoryname);
 
 /**
  * @brief Generate the list of block from a message

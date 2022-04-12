@@ -18,6 +18,7 @@ clean:
 	@rm -f ./bin/*
 	@rm -f ./*.o
 	@rm -f ./testing
+	@rm -f ./here.txt
 
 #new: src/system.o src/tinymt32.o
 #	$(CC) $(INCLUDE_HEADERS_DIRECTORY) -o ./bin/$@ $^ -g
@@ -31,9 +32,11 @@ test_system:  ./src/tinymt32.o tests/test_system.o src/system.o
 	$(CC) $(INCLUDE_HEADERS_DIRECTORY) $(INCLUDE_CUNIT) $(LINK_CUNIT) -o ./bin/$@ $^ -lcunit
 	./bin/$@
 
-tests: ./tests/testRun.o     ./tests/test_tinymt32.o ./src/tinymt32.o       tests/test_system.o src/system.o     tests/test_block.o  src/block.o
-	$(CC) $(INCLUDE_HEADERS_DIRECTORY) $(INCLUDE_CUNIT) $(LINK_CUNIT) -o ./testing $^ -lcunit
-	./testing
+tests: ./tests/testRun.o     ./tests/test_tinymt32.o ./src/tinymt32.o       tests/test_system.o src/system.o     tests/test_block.o  src/block.o    tests/test_message.o
+	@make
+	@./fec ./binary_exemple -f here.txt
+	@$(CC) $(INCLUDE_HEADERS_DIRECTORY) $(INCLUDE_CUNIT) $(LINK_CUNIT) -o ./testing $^ -lcunit
+	@./testing
 
 check:
 	@cppcheck ./src/system.c

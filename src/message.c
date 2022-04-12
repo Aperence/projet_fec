@@ -17,6 +17,8 @@
 
 extern args_t args;
 
+extern threads_args_t t_args;
+
 
 void freeMessage(message_t *m){
     for (int i = 0; i < m->numberBlocks; i++)
@@ -35,10 +37,10 @@ void printMessage(message_t *m){
 }
 
 
-char **readDir(DIR *directory, const char* directoryname, uint32_t *numberFiles){
+char **readDir(DIR *directory, const char* directoryname){
     struct dirent *entry;
 
-    *numberFiles = -2;   // remove "." and ".." from directory
+    t_args.numberFiles = -2;   // remove "." and ".." from directory
 
     if(directory == NULL){
         printf("Unable to read directory");
@@ -46,12 +48,12 @@ char **readDir(DIR *directory, const char* directoryname, uint32_t *numberFiles)
     }
 
     while ((entry = readdir(directory))){
-        (*numberFiles)++;
+        (t_args.numberFiles)++;
     }
     closedir(directory);
     
     directory = opendir(directoryname);
-    char **filenames = malloc((*(numberFiles))*(sizeof(char *)));
+    char **filenames = malloc(t_args.numberFiles*(sizeof(char *)));
 
     int i = 0;
     while ((entry = readdir(directory))){
@@ -173,11 +175,11 @@ message_t *openFile(const char *filename){
 }
 
 void writeToFile(FILE *outFile, message_t *message, const char*filename){
-    uint32_t filenameSize = strlen(filename);
+    uint32_t filenameSize = htobe32(strlen(filename));
     fwrite(&filenameSize, 4, 1, outFile);
-    uint32_t messageSize = message->messageSize;
-    fwrite(&(messageSize), 4, 1, outFile);
-    fwrite(filename, filenameSize, 1, outFile);
+    uint64_t messageSize =  htobe64(message->messageSize);
+    fwrite(&(messageSize), 8, 1, outFile);
+    fwrite(filename, strlen(filename), 1, outFile);
 
     for (uint32_t i = 0; i < message->numberBlocks; i++)
     {

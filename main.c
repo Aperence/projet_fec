@@ -8,8 +8,9 @@
 #include <limits.h>
 #include <inttypes.h>
 #include <stdbool.h>
-#include "./headers/tinymt32.h"
+#include "tinymt32.h"
 #include "message.h"
+#include "portable_semaphore.h"
 
 typedef struct args
 {
@@ -20,11 +21,17 @@ typedef struct args
     bool verbose;
 } args_t;
 
+typedef struct threads_args{
+    char **filenames;               //list of filenames from which threads will consume
+    uint32_t nextFile;              // index of next file to be processed
+    uint32_t numberFiles;
+    sem_t *semaphore_read;          // semaphore used to read next filename
+    sem_t *semaphore_writing;       // semaphore used to write to the out file
+}threads_args_t;
+
 args_t args;
 
-char **filenames;   //list of filenames from which threads will consume
-uint32_t nextFile = 0;   // index of next file to be processed
-uint32_t numberFiles;
+threads_args_t t_args;
 
 void usage(char *prog_name)
 {
@@ -107,28 +114,29 @@ int main(int argc, char *argv[])
         exit(EXIT_SUCCESS);
     }
 
-    filenames = readDir(args.input_dir, args.input_dir_path, &numberFiles);
+    t_args.filenames = readDir(args.input_dir, args.input_dir_path);
 
     // threads here
-    while (nextFile < numberFiles)
+    while (t_args.nextFile < t_args.numberFiles)
     {
         
         char *path = malloc(PATH_MAX);
         strcpy(path, args.input_dir_path);
         strcat(path, "/");
-        strcat(path, *(filenames + nextFile));
+        strcat(path, *(t_args.filenames + t_args.nextFile));
         if (args.verbose){
-            printf(">>>>>> filename : %s\n", *(filenames + nextFile));
+            printf(">>>>>> filename : %s\n", *(t_args.filenames + t_args.nextFile));
             printf(">>>>>> path     : %s\n", path);
         }
         message_t *message = openFile(path);
         processBlock(message->listBlock, message->numberBlocks, message->seed, message->size_redundance, message->size_symbol);
-        writeToFile(args.output_stream, message, *(filenames+nextFile));
-        free(*(filenames + nextFile));
-        nextFile++;
+        writeToFile(args.output_stream, message, *(t_args.filenames+t_args.nextFile));
+        free(*(t_args.filenames + t_args.nextFile));
+        free(path);
+        t_args.nextFile++;
     }
     
-    free(filenames);
+    free(t_args.filenames);
     
     /**
     // Close the input directory and the output file
