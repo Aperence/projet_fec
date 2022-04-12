@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+
 /**
  * @brief Take the next free file that is not blocked by a semaphore and check that we do not exceed the number of files
  */
