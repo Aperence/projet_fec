@@ -15,9 +15,6 @@
 #include "portable_endian.h"
 #include "main.h"
 
-extern args_t args;
-
-extern threads_args_t t_args;
 
 
 void freeMessage(message_t *m){

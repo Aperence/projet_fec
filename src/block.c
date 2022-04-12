@@ -7,7 +7,6 @@
 #include "tinymt32.h"
 #include "main.h"
 
-extern args_t args;
 
 uint8_t verifySymbolLost(uint8_t *symb, uint32_t size){
     for (int i = 0; i < size; i++)

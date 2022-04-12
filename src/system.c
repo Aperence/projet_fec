@@ -7,8 +7,6 @@
 #include "tinymt32.h"
 #include "main.h"
 
-extern args_t args;
-
 
 void gf_256_full_add_vector(uint8_t *symbol_1, uint8_t *symbol_2, uint32_t symbol_size){
     for (int i = 0; i < symbol_size; i++)

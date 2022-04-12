@@ -9,8 +9,6 @@
 #include "portable_semaphore.h"
 #include "my_threads.h"
 
-extern args_t args;
-extern threads_args_t t_args;
 
 uint32_t getNextFile(){
     uint32_t val = 0;
