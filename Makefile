@@ -5,7 +5,7 @@ INCLUDE_HEADERS_DIRECTORY=-Iheaders
 INCLUDE_CUNIT = -I$(HOME)/local/include
 LINK_CUNIT = -L$(HOME)/local/lib
 
-fec: main.o  ./src/block.o  ./src/message.o  ./src/system.o  ./src/tinymt32.o
+fec: main.o  ./src/block.o  ./src/message.o  ./src/system.o  ./src/tinymt32.o ./src/my_threads.o
 	$(CC) $(INCLUDE_HEADERS_DIRECTORY) $(CFLAGS) -o $@ $^ $(LIBS)
 
 %.o: %.c

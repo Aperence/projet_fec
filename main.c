@@ -8,26 +8,13 @@
 #include <limits.h>
 #include <inttypes.h>
 #include <stdbool.h>
+#include <pthread.h>
 #include "tinymt32.h"
 #include "message.h"
 #include "portable_semaphore.h"
+#include "main.h"
+#include "my_threads.h"
 
-typedef struct args
-{
-    DIR *input_dir;
-    char input_dir_path[PATH_MAX];
-    FILE *output_stream;
-    uint8_t nb_threads;
-    bool verbose;
-} args_t;
-
-typedef struct threads_args{
-    char **filenames;               //list of filenames from which threads will consume
-    uint32_t nextFile;              // index of next file to be processed
-    uint32_t numberFiles;
-    sem_t *semaphore_read;          // semaphore used to read next filename
-    sem_t *semaphore_writing;       // semaphore used to write to the out file
-}threads_args_t;
 
 args_t args;
 
@@ -116,25 +103,27 @@ int main(int argc, char *argv[])
 
     t_args.filenames = readDir(args.input_dir, args.input_dir_path);
 
-    // threads here
-    while (t_args.nextFile < t_args.numberFiles)
-    {
-        
-        char *path = malloc(PATH_MAX);
-        strcpy(path, args.input_dir_path);
-        strcat(path, "/");
-        strcat(path, *(t_args.filenames + t_args.nextFile));
-        if (args.verbose){
-            printf(">>>>>> filename : %s\n", *(t_args.filenames + t_args.nextFile));
-            printf(">>>>>> path     : %s\n", path);
-        }
-        message_t *message = openFile(path);
-        processBlock(message->listBlock, message->numberBlocks, message->seed, message->size_redundance, message->size_symbol);
-        writeToFile(args.output_stream, message, *(t_args.filenames+t_args.nextFile));
-        free(*(t_args.filenames + t_args.nextFile));
-        free(path);
-        t_args.nextFile++;
+    t_args.semaphore_read = my_sem_init(1);
+
+    t_args.semaphore_writing = my_sem_init(1);
+    
+    pthread_t th[args.nb_threads];
+
+    uint32_t i;
+    
+    for(i = 0; i< args.nb_threads;i++){
+        pthread_create(&th[i], NULL, &processFile, &i);
     }
+    
+    for (i = 0; i < args.nb_threads; i++)
+    {
+        pthread_join(th[i], NULL);
+    }
+    
+
+    my_sem_destroy(t_args.semaphore_read);
+
+    my_sem_destroy(t_args.semaphore_writing);
     
     free(t_args.filenames);
     

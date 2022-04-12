@@ -47,4 +47,4 @@ You can then launch the execution time test by launching the following command i
 ./executionSpeed.sh
 ```
 
-For example, the average speed we mesured for our program to run was ~ 9.817 ms.
+For example, the average speed we mesured for our program to run was ~ 10.817 ms.

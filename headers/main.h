@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <dirent.h>
 #include <stdbool.h>
+#include "portable_semaphore.h"
 
 typedef struct args
 {
@@ -19,11 +20,13 @@ typedef struct args
 args_t args;
 
 typedef struct threads_args{
-    char **filenames;    //list of filenames from which threads will consume
-    uint32_t nextFile;   // index of next file to be processed
+    char **filenames;               //list of filenames from which threads will consume
+    uint32_t nextFile;              // index of next file to be processed
     uint32_t numberFiles;
+    sem_t *semaphore_read;          // semaphore used to read next filename
+    sem_t *semaphore_writing;       // semaphore used to write to the out file
 }threads_args_t;
 
-args_t args;
+threads_args_t t_args;
 
 #endif

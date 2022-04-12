@@ -4,9 +4,6 @@
 #include <stdint.h>
 #include "block.h"
 
-char **filenames;
-uint32_t numberFiles;
-
 typedef struct
 {
     uint32_t seed;              // seed used to generate redundancy symbols
