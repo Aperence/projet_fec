@@ -51,11 +51,17 @@ char **readDir(DIR *directory, const char* directoryname){
     
     directory = opendir(directoryname);
     char **filenames = malloc(t_args.numberFiles*(sizeof(char *)));
+    if (filenames == NULL){
+        fprintf(stderr, "Error with the malloc which represents the files to be processed");
+    }
 
     int i = 0;
     while ((entry = readdir(directory))){
         if (!strcmp(entry->d_name, "..") == 0 && !strcmp(entry->d_name, ".") == 0){
             char *filename = malloc(256);
+            if (filename == NULL){
+                fprintf(stderr, "Error with the malloc which represents the file to be processed");
+            }
             strcpy(filename, entry->d_name);
             *(filenames + i) = filename;
             i++;
@@ -69,6 +75,9 @@ char **readDir(DIR *directory, const char* directoryname){
 
 block_t **makeBlockList(uint32_t numberBlocks, uint8_t *message, uint32_t block_size, uint32_t symbol_size, uint32_t redundance_size, uint32_t messageSize, uint32_t padding){
     block_t **ret = malloc(sizeof(block_t *)*numberBlocks);
+    if (ret == NULL){
+        fprintf(stderr, "Error with the malloc which was created to return all created blocks");
+    }
     uint32_t offset = 0;
     for (uint32_t i = 0; i < numberBlocks; i++) //iterate on blocks
     {
@@ -80,9 +89,15 @@ block_t **makeBlockList(uint32_t numberBlocks, uint8_t *message, uint32_t block_
                 number_symbol = lastBlockSize + redundance_size;
         }
         listSymbol = malloc(number_symbol*sizeof(uint8_t *));
+        if (listSymbol == NULL){
+            fprintf(stderr, "Error with the malloc which was created to return all created symbols");
+        }
         for (uint32_t j = 0; j < number_symbol; j++) //iterate on symbols
         {
             uint8_t *symbol = malloc(symbol_size);
+            if (listSymbol == NULL){
+                fprintf(stderr, "Error with the malloc which was created to store the symbol");
+            }
             if (i == numberBlocks - 1 && j == number_symbol - 1 - redundance_size){ // last symbol of last block => add padding
                 memset(symbol, (uint8_t) 0, symbol_size);
                 memcpy(symbol, (void *) (message + offset), symbol_size);

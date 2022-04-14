@@ -20,6 +20,9 @@ uint8_t verifySymbolLost(uint8_t *symb, uint32_t size){
 
 uint8_t *verifyBlock(block_t *block, uint32_t *nb_unk, uint32_t size_redundance, uint32_t size_symbol){
     uint8_t *s = malloc(sizeof(uint8_t)*((block->size_block)+size_redundance));
+    if (s == NULL){
+        fprintf(stderr, "Error with the malloc to verify the block");
+    }
     *nb_unk = 0;
     for (uint32_t i = 0; i < block->size_block + size_redundance; i++)
     {
@@ -121,7 +124,13 @@ void processBlock(block_t **list_block, uint8_t size, uint32_t seed, uint32_t si
             }
 
             uint8_t **A = malloc(sizeof(uint8_t *) * nb_unk);
+            if (A == NULL){
+                fprintf(stderr, "Error with the malloc to create the matrix A for the linear system");
+            }
             uint8_t **b = malloc(sizeof(uint8_t *) * nb_unk);
+            if (b == NULL){
+                fprintf(stderr, "Error with the malloc to create the matrix b for the linear system");
+            }
             makeLinearSystem(*(list_block + i), s, nb_unk, coeffs, A, b, size_symbol);
 
             if (args.verbose){

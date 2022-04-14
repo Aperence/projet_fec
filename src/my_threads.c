@@ -26,6 +26,9 @@ void *processFile(void *args_file){
     uint32_t fileNumber = getNextFile();
     while (fileNumber != -1){
         char *path = malloc(PATH_MAX);
+        if (path == NULL){
+            fprintf(stderr, "Error with the malloc which cas created to store the path of the file with the threads");
+        }
         strcpy(path, args.input_dir_path);
         strcat(path, "/");
         strcat(path, *(t_args.filenames + fileNumber));

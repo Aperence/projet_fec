@@ -17,6 +17,9 @@ void gf_256_full_add_vector(uint8_t *symbol_1, uint8_t *symbol_2, uint32_t symbo
 
 uint8_t *gf_256_full_add_vector_ret(uint8_t *symbol_1, uint8_t *symbol_2, uint32_t symbol_size){
     uint8_t *ret = malloc(sizeof(uint8_t)*symbol_size);
+    if (ret == NULL){
+        fprintf(stderr, "Error with the malloc which was created for the addition value gf 256");
+    }
     for (int i = 0; i < symbol_size; i++)
     {
         *(ret+i) = *(symbol_1+i) ^ *(symbol_2 + i);
@@ -33,6 +36,9 @@ void gf_256_mul_vector(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_size){
 
 uint8_t *gf_256_mul_vector_ret(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_size){
     uint8_t *ret = malloc(sizeof(uint8_t)*symbol_size);
+    if (ret == NULL){
+        fprintf(stderr, "Error with the malloc which was created for the multiplication value gf 256");
+    }
     for (int i = 0; i < symbol_size; i++)
     {
         *(ret+i) = gf256_mul_table[*(symbol_1+i)][coef];
@@ -109,6 +115,9 @@ void gf_256_gaussian_elimination(uint8_t **A, uint8_t **B, uint32_t symbol_size,
 
 uint8_t **gen_coefs(tinymt32_t prng, uint32_t nss, uint32_t nrs){
     uint8_t **res = malloc(sizeof(uint8_t *)*nss);
+    if (res == NULL){
+        fprintf(stderr, "Error with the malloc which was created to store the coefs of gf 256");
+    }
     for (int i = 0; i < nss; i++)
     {
         uint8_t *temp = malloc(sizeof(uint8_t)*nrs);
