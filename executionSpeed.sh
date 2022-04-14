@@ -1,3 +1,4 @@
+export CFLAGS='-gdwarf-2 -gstrict-dwarf'
 make
 N=200
 TIMESTART=$EPOCHREALTIME
