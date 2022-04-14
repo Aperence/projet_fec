@@ -3,9 +3,17 @@
 #include "test_block.h"
 #include "test_message.h"
 #include <CUnit/Basic.h>
+#include "main.h"
+
+args_t args;
 
 int main(int argc, char const *argv[])
 {
+
+    args.input_dir = NULL;
+    args.verbose = 0;
+    args.nb_threads = 4;
+    args.output_stream = NULL;
     CU_initialize_registry();
     addSuiteSystem();
     addSuiteTinymt();

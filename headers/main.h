@@ -17,7 +17,7 @@ typedef struct args
     bool verbose;
 } args_t;
 
-args_t args;
+extern args_t args;
 
 typedef struct threads_args{
     char **filenames;               //list of filenames from which threads will consume
@@ -27,6 +27,6 @@ typedef struct threads_args{
     sem_t *semaphore_writing;       // semaphore used to write to the out file
 }threads_args_t;
 
-threads_args_t t_args;
+extern threads_args_t t_args;
 
 #endif
