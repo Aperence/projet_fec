@@ -34,6 +34,7 @@ uint32_t gf_256_mul_vector(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_size
     {
         *(symbol_1+i) = gf256_mul_table[*(symbol_1+i)][coef];
     }
+    return 0;
 }
 
 uint8_t *gf_256_mul_vector_ret(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_size){
