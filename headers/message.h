@@ -74,7 +74,7 @@ message_t *openFile(const char *filename);
  * @param message : The recovered message to write to file
  * @param filename : The name of the processed file from which message was extracted
  *
- * @error : return NULL in case of error
+ * @error : return -1 in case of error
  */
 uint32_t writeToFile(FILE *outFile, message_t *message, const char*filename);
 

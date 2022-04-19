@@ -239,16 +239,16 @@ uint32_t writeToFile(FILE *outFile, message_t *message, const char*filename){
     uint32_t filenameSize = htobe32(strlen(filename));
     if (fwrite(&filenameSize, 4, 1, outFile) != 1) {
         fprintf(stderr, "Error with the malloc while writting in the file\n");
-        return NULL;
+        return -1;
     }
     uint64_t messageSize =  htobe64(message->messageSize);
     if (fwrite(&(messageSize), 8, 1, outFile) != 1){
         fprintf(stderr, "Error with the malloc while writting in the file\n");
-        return NULL;
+        return -1;
     }
     if (fwrite(filename, strlen(filename), 1, outFile) != 1){
         fprintf(stderr, "Error with the malloc while writting in the file\n");
-        return NULL;
+        return -1;
     }
     
 
@@ -260,12 +260,12 @@ uint32_t writeToFile(FILE *outFile, message_t *message, const char*filename){
             if (i==message->numberBlocks - 1 && j == b->size_block - 1){
                 if (fwrite(*(b->symb_list + j), 1, message->size_symbol - message->padding , outFile) != message->size_symbol - message->padding){
                     fprintf(stderr, "Error with the malloc while writting in the file\n");
-                    return NULL;
+                    return -1;
                 }
             }else{
                 if (fwrite(*(b->symb_list + j), 1, message->size_symbol , outFile) != message->size_symbol){
                     fprintf(stderr, "Error with the malloc while writting in the file\n");
-                    return NULL;
+                    return -1;
                 }
             }
             free(*(b->symb_list + j));
