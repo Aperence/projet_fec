@@ -141,31 +141,31 @@ message_t *openFile(const char *filename){
     uint32_t seed;
     if (fread(&seed, sizeof(uint32_t), 1, f)<1){
         fprintf(stderr, "Error while reading the seed of %s\n", filename);
-        return NULL;
+        return -1;
     }
     seed = be32toh(seed);
     uint32_t block_size;
     if (fread(&block_size, sizeof(uint32_t), 1, f)<1){
         fprintf(stderr, "Error while reading the block size of %s\n", filename);
-        return NULL;
+        return -1;
     }
     block_size = be32toh(block_size);
     uint32_t symbol_size;
     if (fread(&symbol_size, sizeof(uint32_t), 1, f)<1){
         fprintf(stderr, "Error while reading the symbol size of %s\n", filename);
-        return NULL;
+        return -1;
     }
     symbol_size = be32toh(symbol_size);
     uint32_t redundance_size;
     if (fread(&redundance_size, sizeof(uint32_t), 1, f)<1){
         fprintf(stderr, "Error while reading the number of redundancy of %s\n", filename);
-        return NULL;
+        return -1;
     }
     redundance_size = be32toh(redundance_size);
     uint64_t message_size;
     if (fread(&message_size, sizeof(uint64_t), 1, f)<1){
         fprintf(stderr, "Error while reading the size of message of %s\n", filename);
-        return NULL;
+        return -1;
     }
     message_size = be64toh(message_size);
 
@@ -178,7 +178,7 @@ message_t *openFile(const char *filename){
     }
     
     struct stat st;
-    if (stat(filename, &st)<0) return NULL;
+    if (stat(filename, &st)<0) return -1;
 
     uint32_t numberBlocks = (message_size) / ((block_size) * (symbol_size));
 
@@ -193,17 +193,17 @@ message_t *openFile(const char *filename){
     uint8_t *fileMessage = malloc(st.st_size - 24);
     if (fileMessage == NULL){
         fprintf(stderr, "Error with the malloc while openning file\n");
-        return NULL;
+        return -1;
     }
     if (fread(fileMessage , 1, st.st_size - 24 , f)< st.st_size-24){
         fprintf(stderr, "Error while reading the message of %s\n", filename);
-        return NULL;
+        return -1;
     }
     
     block_t **blockList = makeBlockList(numberBlocks, fileMessage , block_size, symbol_size, redundance_size, message_size, padding);
     if (blockList == NULL){
         fprintf(stderr, "Error with the malloc while openning file\n");
-        return NULL;
+        return -1;
     }
     
  
@@ -213,7 +213,7 @@ message_t *openFile(const char *filename){
 
     if (message == NULL){
         fprintf(stderr, "Error with the malloc of message\n");
-        return NULL;
+        return -1;
     }
 
     message->seed = seed;
