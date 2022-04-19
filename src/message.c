@@ -183,7 +183,7 @@ message_t *openFile(const char *filename){
     }
     
     struct stat st;
-    if (stat(filename, &st)<0) return NULL;
+    if (stat(filename, &st)<0) {fclose(f); return NULL;}
 
     uint32_t numberBlocks = (message_size) / ((block_size) * (symbol_size));
 
@@ -204,6 +204,7 @@ message_t *openFile(const char *filename){
     if (fread(fileMessage , 1, st.st_size - 24 , f)< st.st_size-24){
         fprintf(stderr, "Error while reading the message of %s\n", filename);
         fclose(f);
+        free(fileMessage);
         return NULL;
     }
     
