@@ -20,14 +20,14 @@ typedef struct
  * 
  * @param m : The message to free
  */
-void freeMessage(message_t *m);
+uint32_t freeMessage(message_t *m);
 
 /**
  * @brief Print the message m to stdout
  * 
  * @param m : The message to print
  */
-void printMessage(message_t *m);
+uint32_t printMessage(message_t *m);
 
 /**
  * @brief Return a list of the names of files contained in directory. Futhermore, put the number of files in this directory in numberFiles
@@ -35,6 +35,8 @@ void printMessage(message_t *m);
  * @param directory : An open directory 
  * @param directoryname : The name of the directory
  * @return An array of the list of names of files contained in directory
+ *
+ * @error : return NULL in case of error
  */
 char **readDir(DIR *directory, const char* directoryname);
 
@@ -50,6 +52,8 @@ char **readDir(DIR *directory, const char* directoryname);
  * @param padding : The number of padding for last symbol
  * @return A list of blocks representing "message" containing "block_size" symbols of size "symbol_size" each and "redundancy_size" number of redundancy symbols.
  *         The last symbols is added padding of size "padding".
+ *
+ * @error : return NULL in case of error
  */
 block_t **makeBlockList(uint32_t numberBlocks, uint8_t *message, uint32_t block_size, uint32_t symbol_size, uint32_t redundance_size, uint32_t messageSize, uint32_t padding);
 
@@ -58,6 +62,8 @@ block_t **makeBlockList(uint32_t numberBlocks, uint8_t *message, uint32_t block_
  * 
  * @param filename : The name of the file to process
  * @return A struct containing the list of blocks representing the content of file and informations contained by this fil
+ *
+ * @error : return NULL in case of error
  */
 message_t *openFile(const char *filename);
 
@@ -67,7 +73,9 @@ message_t *openFile(const char *filename);
  * @param outFile : The file stream to write to
  * @param message : The recovered message to write to file
  * @param filename : The name of the processed file from which message was extracted
+ *
+ * @error : return NULL in case of error
  */
-void writeToFile(FILE *outFile, message_t *message, const char*filename);
+uint32_t writeToFile(FILE *outFile, message_t *message, const char*filename);
 
 #endif /* MESSAGE_H */

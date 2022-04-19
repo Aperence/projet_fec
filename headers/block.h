@@ -26,6 +26,7 @@ uint8_t verifySymbolLost(uint8_t *symb, uint32_t size);
  * @param size_symbol : the size of a symbol of the block
  * @return A pointer containing for each symbol of block 1 if the symbol is lost, 
  *                                                       0 if the symbol isn't lost
+ * @error : return NULL in case of error
  */
 uint8_t *verifyBlock(block_t *block, uint32_t *nb_unk, uint32_t size_redundance, uint32_t size_symbol);
 
@@ -39,8 +40,10 @@ uint8_t *verifyBlock(block_t *block, uint32_t *nb_unk, uint32_t size_redundance,
  * @param A : An empty matrix of size nb_unk, used to contain the coefficient of system
  * @param b : An empty matrix of size nb_unk, used to contain the independant terms
  * @param size_symbol : the size of a symbol of block
+ *
+ * @error : return -1 in case of error
  */
-void makeLinearSystem(block_t *block, uint8_t *lost_indexes, uint32_t nb_unk, uint8_t **coeffs, uint8_t **A, uint8_t **b, uint32_t size_symbol);
+uint32_t makeLinearSystem(block_t *block, uint8_t *lost_indexes, uint32_t nb_unk, uint8_t **coeffs, uint8_t **A, uint8_t **b, uint32_t size_symbol);
 
 /**
  * @brief Replace the lost symbols in block by the symbols recovered using redundancy
@@ -50,7 +53,7 @@ void makeLinearSystem(block_t *block, uint8_t *lost_indexes, uint32_t nb_unk, ui
  * @param lost_indexes : A pointer containing at position i : 1 if the ith symbol of block is lost, 0 otherwise
  * @param size_redundancy : the number of redundancy symbols in the block
  */
-void fillLostSymbol(block_t *block, uint8_t **symbols, uint8_t *lost_indexes, uint32_t size_redundance);
+uint32_t fillLostSymbol(block_t *block, uint8_t **symbols, uint8_t *lost_indexes, uint32_t size_redundance);
 
 /**
  * @brief Free the pointers in the matrix and the pointer of the matrix
@@ -58,7 +61,7 @@ void fillLostSymbol(block_t *block, uint8_t **symbols, uint8_t *lost_indexes, ui
  * @param matrix : The matrix to free
  * @param rows : Number of rows in the matrix
  */
-void freeMatrix(uint8_t **matrix, uint32_t rows);
+uint32_t freeMatrix(uint8_t **matrix, uint32_t rows);
 
 /**
  * @brief For each block of list_block, recover the lost symbols in the block and fill them in it
@@ -68,8 +71,10 @@ void freeMatrix(uint8_t **matrix, uint32_t rows);
  * @param seed : Seed used to generate redundancy
  * @param size_redundancy : the number of redundancy symbols in blocks
  * @param size_symbol : the size of a symbol in block list
+ *
+ * @error : return -1 in case of error
  */
-void processBlock(block_t **list_block, uint8_t size, uint32_t seed, uint32_t size_redundance, uint32_t size_symbol);
+uint32_t processBlock(block_t **list_block, uint8_t size, uint32_t seed, uint32_t size_redundance, uint32_t size_symbol);
 
 /**
  * @brief Free the memory used by block
@@ -77,7 +82,7 @@ void processBlock(block_t **list_block, uint8_t size, uint32_t seed, uint32_t si
  * @param block : the block to free
  * @param size_redundance : the number of redundancy symbols in block
  */
-void freeBlock(block_t *block, uint32_t size_redundance);
+uint32_t freeBlock(block_t *block, uint32_t size_redundance);
 
 /**
  * @brief Print the block to stdout
@@ -86,6 +91,6 @@ void freeBlock(block_t *block, uint32_t size_redundance);
  * @param size_redundance : the number of redundancy symbols in block
  * @param size_symbol : the size of a symbol in block;
  */
-void printBlock(block_t *block, uint32_t size_redundance, uint32_t size_symbol);
+uint32_t printBlock(block_t *block, uint32_t size_redundance, uint32_t size_symbol);
 
 #endif /* BLOCK_H */

@@ -106,24 +106,46 @@ int main(int argc, char *argv[])
     t_args.semaphore_read = my_sem_init(1);
 
     t_args.semaphore_writing = my_sem_init(1);
+
+    if (t_args.semaphore_read == NULL){
+        fprintf(stderr, "Error semaphore reading files\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (t_args.semaphore_writing == NULL){
+        fprintf(stderr, "Error semaphore writing files\n");
+        exit(EXIT_FAILURE);
+    }
     
     pthread_t th[args.nb_threads];
 
     uint32_t i;
     
     for(i = 0; i< args.nb_threads;i++){
-        pthread_create(&th[i], NULL, &processFile, &i);
+        if (pthread_create(&th[i], NULL, &processFile, &i) != 0){
+            fprintf(stderr, "Error creating thread %s\n", strerror(errno));
+            exit(EXIT_FAILURE);
+        }
     }
     
     for (i = 0; i < args.nb_threads; i++)
     {
-        pthread_join(th[i], NULL);
+        if (pthread_join(th[i], NULL) != 0){
+            fprintf(stderr, "Error joining thread %s\n", strerror(errno));
+            exit(EXIT_FAILURE);
+        };
     }
     
 
-    my_sem_destroy(t_args.semaphore_read);
+    if (my_sem_destroy(t_args.semaphore_read) != 0){
+        fprintf(stderr, "Error destroying semaphore reading %s\n", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
 
-    my_sem_destroy(t_args.semaphore_writing);
+    if (my_sem_destroy(t_args.semaphore_writing) != 0){
+        fprintf(stderr, "Error destroying semaphore writing %s\n", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
     
     free(t_args.filenames);
     

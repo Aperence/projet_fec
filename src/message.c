@@ -17,20 +17,22 @@
 
 
 
-void freeMessage(message_t *m){
+uint32_t freeMessage(message_t *m){
     for (int i = 0; i < m->numberBlocks; i++)
     {
         freeBlock(*(m->listBlock + i), m->size_redundance);
     }
     free(m->listBlock);
     free(m);
+    return 0;
 }
 
-void printMessage(message_t *m){
+uint32_t printMessage(message_t *m){
     for (int i = 0; i < m->numberBlocks; i++)
     {
         printBlock(*(m->listBlock + i), m->size_redundance, m->size_symbol);
     }
+    return 0;
 }
 
 
@@ -50,9 +52,14 @@ char **readDir(DIR *directory, const char* directoryname){
     closedir(directory);
     
     directory = opendir(directoryname);
+    if (directory == NULL){
+        fprintf(stderr, "Error with the opening of the directory\n");
+        return NULL;
+    }
     char **filenames = malloc(t_args.numberFiles*(sizeof(char *)));
     if (filenames == NULL){
-        fprintf(stderr, "Error with the malloc which represents the files to be processed");
+        fprintf(stderr, "Error with the malloc which represents the files to be processed\n");
+        return NULL;
     }
 
     int i = 0;
@@ -60,7 +67,8 @@ char **readDir(DIR *directory, const char* directoryname){
         if (!strcmp(entry->d_name, "..") == 0 && !strcmp(entry->d_name, ".") == 0){
             char *filename = malloc(256);
             if (filename == NULL){
-                fprintf(stderr, "Error with the malloc which represents the file to be processed");
+                fprintf(stderr, "Error with the malloc which represents the file to be processed\n");
+                return NULL;
             }
             strcpy(filename, entry->d_name);
             *(filenames + i) = filename;
@@ -76,7 +84,8 @@ char **readDir(DIR *directory, const char* directoryname){
 block_t **makeBlockList(uint32_t numberBlocks, uint8_t *message, uint32_t block_size, uint32_t symbol_size, uint32_t redundance_size, uint32_t messageSize, uint32_t padding){
     block_t **ret = malloc(sizeof(block_t *)*numberBlocks);
     if (ret == NULL){
-        fprintf(stderr, "Error with the malloc which was created to return all created blocks");
+        fprintf(stderr, "Error with the malloc which was created to return all created blocks\n");
+        return NULL;
     }
     uint32_t offset = 0;
     for (uint32_t i = 0; i < numberBlocks; i++) //iterate on blocks
@@ -90,13 +99,15 @@ block_t **makeBlockList(uint32_t numberBlocks, uint8_t *message, uint32_t block_
         }
         listSymbol = malloc(number_symbol*sizeof(uint8_t *));
         if (listSymbol == NULL){
-            fprintf(stderr, "Error with the malloc which was created to return all created symbols");
+            fprintf(stderr, "Error with the malloc which was created to return all created symbols\n");
+            return NULL;
         }
         for (uint32_t j = 0; j < number_symbol; j++) //iterate on symbols
         {
             uint8_t *symbol = malloc(symbol_size);
             if (listSymbol == NULL){
-                fprintf(stderr, "Error with the malloc which was created to store the symbol");
+                fprintf(stderr, "Error with the malloc which was created to store the symbol\n");
+                return NULL;
             }
             if (i == numberBlocks - 1 && j == number_symbol - 1 - redundance_size){ // last symbol of last block => add padding
                 memset(symbol, (uint8_t) 0, symbol_size);
@@ -110,6 +121,10 @@ block_t **makeBlockList(uint32_t numberBlocks, uint8_t *message, uint32_t block_
         }
 
         block_t *temp = malloc(sizeof(block_t));
+        if (temp == NULL){
+            fprintf(stderr, "Error with the malloc of block\n");
+            return NULL;
+        }
         temp->size_block = number_symbol - redundance_size;
         temp->symb_list = listSymbol;
         *(ret+i) = temp;
@@ -121,20 +136,37 @@ message_t *openFile(const char *filename){
 
     FILE *f = fopen(filename, "r");
 
+    if (f == NULL) return NULL;
+
     uint32_t seed;
-    fread(&seed, sizeof(uint32_t), 1, f);
+    if (fread(&seed, sizeof(uint32_t), 1, f)<1){
+        fprintf(stderr, "Error while reading the seed of %s\n", filename);
+        return NULL;
+    }
     seed = be32toh(seed);
     uint32_t block_size;
-    fread(&block_size, sizeof(uint32_t), 1, f);
+    if (fread(&block_size, sizeof(uint32_t), 1, f)<1){
+        fprintf(stderr, "Error while reading the block size of %s\n", filename);
+        return NULL;
+    }
     block_size = be32toh(block_size);
     uint32_t symbol_size;
-    fread(&symbol_size, sizeof(uint32_t), 1, f);
+    if (fread(&symbol_size, sizeof(uint32_t), 1, f)<1){
+        fprintf(stderr, "Error while reading the symbol size of %s\n", filename);
+        return NULL;
+    }
     symbol_size = be32toh(symbol_size);
     uint32_t redundance_size;
-    fread(&redundance_size, sizeof(uint32_t), 1, f);
+    if (fread(&redundance_size, sizeof(uint32_t), 1, f)<1){
+        fprintf(stderr, "Error while reading the number of redundancy of %s\n", filename);
+        return NULL;
+    }
     redundance_size = be32toh(redundance_size);
     uint64_t message_size;
-    fread(&message_size, sizeof(uint64_t), 1, f);
+    if (fread(&message_size, sizeof(uint64_t), 1, f)<1){
+        fprintf(stderr, "Error while reading the size of message of %s\n", filename);
+        return NULL;
+    }
     message_size = be64toh(message_size);
 
     uint32_t lastBlockSize = (message_size) % ((block_size) * (symbol_size));
@@ -146,7 +178,7 @@ message_t *openFile(const char *filename){
     }
     
     struct stat st;
-    stat(filename, &st);
+    if (stat(filename, &st)<0) return NULL;
 
     uint32_t numberBlocks = (message_size) / ((block_size) * (symbol_size));
 
@@ -159,13 +191,30 @@ message_t *openFile(const char *filename){
     }
 
     uint8_t *fileMessage = malloc(st.st_size - 24);
-    fread(fileMessage , 1, st.st_size - 24 , f);
+    if (fileMessage == NULL){
+        fprintf(stderr, "Error with the malloc while openning file\n");
+        return NULL;
+    }
+    if (fread(fileMessage , 1, st.st_size - 24 , f)< st.st_size-24){
+        fprintf(stderr, "Error while reading the message of %s\n", filename);
+        return NULL;
+    }
     
     block_t **blockList = makeBlockList(numberBlocks, fileMessage , block_size, symbol_size, redundance_size, message_size, padding);
+    if (blockList == NULL){
+        fprintf(stderr, "Error with the malloc while openning file\n");
+        return NULL;
+    }
+    
  
     free(fileMessage);
 
     message_t *message = malloc(sizeof(message_t));
+
+    if (message == NULL){
+        fprintf(stderr, "Error with the malloc of message\n");
+        return NULL;
+    }
 
     message->seed = seed;
     message->messageSize = message_size;
@@ -186,12 +235,22 @@ message_t *openFile(const char *filename){
     return message;
 }
 
-void writeToFile(FILE *outFile, message_t *message, const char*filename){
+uint32_t writeToFile(FILE *outFile, message_t *message, const char*filename){
     uint32_t filenameSize = htobe32(strlen(filename));
-    fwrite(&filenameSize, 4, 1, outFile);
+    if (fwrite(&filenameSize, 4, 1, outFile) != 1) {
+        fprintf(stderr, "Error with the malloc while writting in the file\n");
+        return NULL;
+    }
     uint64_t messageSize =  htobe64(message->messageSize);
-    fwrite(&(messageSize), 8, 1, outFile);
-    fwrite(filename, strlen(filename), 1, outFile);
+    if (fwrite(&(messageSize), 8, 1, outFile) != 1){
+        fprintf(stderr, "Error with the malloc while writting in the file\n");
+        return NULL;
+    }
+    if (fwrite(filename, strlen(filename), 1, outFile) != 1){
+        fprintf(stderr, "Error with the malloc while writting in the file\n");
+        return NULL;
+    }
+    
 
     for (uint32_t i = 0; i < message->numberBlocks; i++)
     {
@@ -199,9 +258,15 @@ void writeToFile(FILE *outFile, message_t *message, const char*filename){
         for (uint32_t j = 0; j < b->size_block ; j++)
         {
             if (i==message->numberBlocks - 1 && j == b->size_block - 1){
-                fwrite(*(b->symb_list + j), 1, message->size_symbol - message->padding , outFile);
+                if (fwrite(*(b->symb_list + j), 1, message->size_symbol - message->padding , outFile) != message->size_symbol - message->padding){
+                    fprintf(stderr, "Error with the malloc while writting in the file\n");
+                    return NULL;
+                }
             }else{
-                fwrite(*(b->symb_list + j), 1, message->size_symbol , outFile);
+                if (fwrite(*(b->symb_list + j), 1, message->size_symbol , outFile) != message->size_symbol){
+                    fprintf(stderr, "Error with the malloc while writting in the file\n");
+                    return NULL;
+                }
             }
             free(*(b->symb_list + j));
         }
@@ -214,4 +279,5 @@ void writeToFile(FILE *outFile, message_t *message, const char*filename){
     }
     free(message->listBlock);
     free(message);
+    return 0;
 }

@@ -22,12 +22,13 @@ uint32_t getNextFile(){
     return val;
 }
 
-void *processFile(void *args_file){
+uint32_t *processFile(void *args_file){
     uint32_t fileNumber = getNextFile();
     while (fileNumber != -1){
         char *path = malloc(PATH_MAX);
         if (path == NULL){
-            fprintf(stderr, "Error with the malloc which cas created to store the path of the file with the threads");
+            fprintf(stderr, "Error with the malloc which cas created to store the path of the file with the threads\n");
+            return NULL;
         }
         strcpy(path, args.input_dir_path);
         strcat(path, "/");
@@ -37,13 +38,14 @@ void *processFile(void *args_file){
             printf(">>>>>> path     : %s\n", path);
         }
         message_t *message = openFile(path);
-        processBlock(message->listBlock, message->numberBlocks, message->seed, message->size_redundance, message->size_symbol);
+        if (message == NULL) return NULL;
+        if (processBlock(message->listBlock, message->numberBlocks, message->seed, message->size_redundance, message->size_symbol)<0) return NULL;
         sem_wait(t_args.semaphore_writing);
-        writeToFile(args.output_stream, message, *(t_args.filenames+fileNumber));
+        if (writeToFile(args.output_stream, message, *(t_args.filenames+fileNumber))<0) return NULL;
         sem_post(t_args.semaphore_writing);
         free(*(t_args.filenames + fileNumber));
         free(path);
         fileNumber = getNextFile();
     }
-    return NULL;
+    return args.output_stream;
 }
