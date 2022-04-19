@@ -22,7 +22,7 @@ uint32_t getNextFile(){
     return val;
 }
 
-uint32_t *processFile(void *args_file){
+void *processFile(void *args_file){
     uint32_t fileNumber = getNextFile();
     while (fileNumber != -1){
         char *path = malloc(PATH_MAX);
@@ -47,5 +47,5 @@ uint32_t *processFile(void *args_file){
         free(path);
         fileNumber = getNextFile();
     }
-    return args.output_stream;
+    return (void *) args.output_stream;
 }
