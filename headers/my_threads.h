@@ -20,6 +20,6 @@ uint32_t getNextFile();
  * @error : return NULL in case of error
  */
 
-uint32_t *processFile(void *args_file);
+void *processFile(void *args_file);
 
 #endif /* THREADS_H */

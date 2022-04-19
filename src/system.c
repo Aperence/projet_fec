@@ -8,12 +8,11 @@
 #include "main.h"
 
 
-uint32_t gf_256_full_add_vector(uint8_t *symbol_1, uint8_t *symbol_2, uint32_t symbol_size){
+void gf_256_full_add_vector(uint8_t *symbol_1, uint8_t *symbol_2, uint32_t symbol_size){
     for (int i = 0; i < symbol_size; i++)
     {
         *(symbol_1+i) = *(symbol_1+i) ^ *(symbol_2 + i);
     }
-    return 0;
 }
 
 uint8_t *gf_256_full_add_vector_ret(uint8_t *symbol_1, uint8_t *symbol_2, uint32_t symbol_size){
@@ -29,12 +28,11 @@ uint8_t *gf_256_full_add_vector_ret(uint8_t *symbol_1, uint8_t *symbol_2, uint32
     return ret;
 }
 
-uint32_t gf_256_mul_vector(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_size){
+void gf_256_mul_vector(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_size){
     for (int i = 0; i < symbol_size; i++)
     {
         *(symbol_1+i) = gf256_mul_table[*(symbol_1+i)][coef];
     }
-    return 0;
 }
 
 uint8_t *gf_256_mul_vector_ret(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_size){
@@ -50,9 +48,8 @@ uint8_t *gf_256_mul_vector_ret(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_
     return ret;
 }
 
-uint32_t gf_256_inv_vector(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_size){
+void gf_256_inv_vector(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_size){
     gf_256_mul_vector(symbol_1, gf256_inv_table[coef], symbol_size);
-    return 0;
 }
 
 uint8_t *gf_256_inv_vector_ret(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_size){

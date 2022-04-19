@@ -26,7 +26,7 @@ uint32_t printVector(uint8_t *vector, uint8_t size);
  * @param symbol_2: the second symbol to add
  * @param symbol_size: size of the two symbols (of the same size!)
  */
-uint32_t gf_256_full_add_vector(uint8_t *symbol_1, uint8_t *symbol_2, uint32_t symbol_size);
+void gf_256_full_add_vector(uint8_t *symbol_1, uint8_t *symbol_2, uint32_t symbol_size);
 
 /**
  * @brief Return a new vector containint the addition of the vector symbol_1 and symbol_2
@@ -46,7 +46,7 @@ uint8_t *gf_256_full_add_vector_ret(uint8_t *symbol_1, uint8_t *symbol_2, uint32
  * @param coef: the coefficient of the scaling
  * @param symbol_size: size of the symbol
  */
-uint32_t gf_256_mul_vector(uint8_t *symbol, uint8_t coef, uint32_t symbol_size);
+void gf_256_mul_vector(uint8_t *symbol, uint8_t coef, uint32_t symbol_size);
 
 /**
  * @brief Return a new vector containint the multiplication of the vector symbol_1 by coef
@@ -66,7 +66,7 @@ uint8_t *gf_256_mul_vector_ret(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_
  * @param coef: the dividing coefficient
  * @param symbol_size: size of the two symbols (of the same size!)
  */
-uint32_t gf_256_inv_vector(uint8_t *symbol, uint8_t coef, uint32_t symbol_size);
+void gf_256_inv_vector(uint8_t *symbol, uint8_t coef, uint32_t symbol_size);
 
 /**
  * @brief Return a new vector containint the division of the vector symbol_1 by coef
