@@ -178,7 +178,7 @@ message_t *openFile(const char *filename){
     uint32_t padding = symbol_size - lastSymbolSize;
 
     if (args.verbose){
-        printf("Seed: %d\nBlock : %d\nRedundance: %d\nSymbol: %d\nMessage: %ld\nPadding : %d\n", seed, block_size, redundance_size, symbol_size, message_size, padding);
+        printf("Seed: %d\nBlock : %d\nRedundance: %d\nSymbol: %d\nMessage: %lld\nPadding : %d\n", seed, block_size, redundance_size, symbol_size, (long long unsigned int) message_size, padding);
     }
     
     struct stat st;
@@ -191,7 +191,7 @@ message_t *openFile(const char *filename){
     }
 
     if (args.verbose){
-        printf("Number blocks : %d\nLast Block size : %d\nLast symbol size : %d\nTotal size : %ld\n", numberBlocks, lastBlockSize, lastSymbolSize, message_size + redundance_size*numberBlocks*symbol_size );
+        printf("Number blocks : %d\nLast Block size : %d\nLast symbol size : %d\nTotal size : %lld\n", numberBlocks, lastBlockSize, lastSymbolSize, (long long unsigned int) message_size + redundance_size*numberBlocks*symbol_size );
     }
 
     uint8_t *fileMessage = malloc(st.st_size - 24);

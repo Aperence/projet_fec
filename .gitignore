@@ -1,3 +1,8 @@
-./bin/*
-./src/*.o
-./tests/*.o
+/bin/*
+/src/*.o
+/tests/*.o
+/binary_exemple/*
+/fec
+/*.o
+/here.txt
+/testing

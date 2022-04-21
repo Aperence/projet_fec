@@ -47,7 +47,7 @@ $ sudo apt install bc
 You can then launch the execution time test by launching the following command in this directory : 
 
 ```bash
-$ ./executionSpeed.sh
+$ ./executionSpeed.sh NUMBER_TIMES NB_THREADS
 ```
 
 For example, the average speed we mesured for our program to run was ~ 10.817 ms.
