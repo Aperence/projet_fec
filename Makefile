@@ -20,10 +20,6 @@ clean:
 	@rm -f ./testing
 	@rm -f ./here.txt
 
-#new: src/system.o src/tinymt32.o
-#	$(CC) $(INCLUDE_HEADERS_DIRECTORY) -o ./bin/$@ $^ -g
-#	./bin/$@
-
 test_tinymn32: ./tests/test_tinymt32.o ./src/tinymt32.o
 	$(CC) $(INCLUDE_HEADERS_DIRECTORY) $(INCLUDE_CUNIT) $(LINK_CUNIT) -o ./bin/$@ $^ -lcunit
 	./bin/$@

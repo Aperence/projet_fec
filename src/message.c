@@ -51,7 +51,7 @@ char **readDir(DIR *directory, const char* directoryname){
     }
     closedir(directory);
     
-    directory = opendir(directoryname);
+    directory = opendir(directoryname);  // we now read the filenames
     if (directory == NULL){
         fprintf(stderr, "Error with the opening of the directory\n");
         return NULL;
@@ -90,14 +90,13 @@ block_t **makeBlockList(uint32_t numberBlocks, uint8_t *message, uint32_t block_
     uint32_t offset = 0;
     for (uint32_t i = 0; i < numberBlocks; i++) //iterate on blocks
     {
-        uint8_t **listSymbol;
         uint32_t number_symbol = block_size+redundance_size;
-        if (i == numberBlocks - 1){
+        if (i == numberBlocks - 1){    // last block => might be uncomplete
                 uint32_t lastBlockSize = ((messageSize) % ((block_size) * (symbol_size))) / symbol_size;
                 if (((messageSize) % ((block_size) * (symbol_size))) % symbol_size != 0) lastBlockSize++;
                 number_symbol = lastBlockSize + redundance_size;
         }
-        listSymbol = malloc(number_symbol*sizeof(uint8_t *));
+        uint8_t **listSymbol = malloc(number_symbol*sizeof(uint8_t *));
         if (listSymbol == NULL){
             fprintf(stderr, "Error with the malloc which was created to return all created symbols\n");
             return NULL;
@@ -105,7 +104,7 @@ block_t **makeBlockList(uint32_t numberBlocks, uint8_t *message, uint32_t block_
         for (uint32_t j = 0; j < number_symbol; j++) //iterate on symbols
         {
             uint8_t *symbol = malloc(symbol_size);
-            if (listSymbol == NULL){
+            if (symbol == NULL){
                 fprintf(stderr, "Error with the malloc which was created to store the symbol\n");
                 return NULL;
             }
@@ -268,14 +267,14 @@ uint32_t writeToFile(FILE *outFile, message_t *message, const char*filename){
         block_t *b = *(message->listBlock+i);
         for (uint32_t j = 0; j < b->size_block ; j++)
         {
-            if (i==message->numberBlocks - 1 && j == b->size_block - 1){
+            if (i==message->numberBlocks - 1 && j == b->size_block - 1){  // last block => remove padding
                 if (fwrite(*(b->symb_list + j), 1, message->size_symbol - message->padding , outFile) != message->size_symbol - message->padding){
-                    fprintf(stderr, "Error with the malloc while writting in the file\n");
+                    fprintf(stderr, "Error while writting in the file\n");
                     return -1;
                 }
             }else{
                 if (fwrite(*(b->symb_list + j), 1, message->size_symbol , outFile) != message->size_symbol){
-                    fprintf(stderr, "Error with the malloc while writting in the file\n");
+                    fprintf(stderr, "Error while writting in the file\n");
                     return -1;
                 }
             }

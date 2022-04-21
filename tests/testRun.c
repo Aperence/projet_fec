@@ -15,6 +15,7 @@ int main(int argc, char const *argv[])
     args.nb_threads = 4;
     args.output_stream = NULL;
     CU_initialize_registry();
+    // add each suite of test
     addSuiteSystem();
     addSuiteTinymt();
     addSuiteBlock();

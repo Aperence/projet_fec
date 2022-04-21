@@ -12,7 +12,7 @@
 
 uint32_t getNextFile(){
     uint32_t val = 0;
-    if (t_args.nextFile >= t_args.numberFiles){
+    if (t_args.nextFile >= t_args.numberFiles){  // all files have been processed
         return -1;
     }
     sem_wait(t_args.semaphore_read);

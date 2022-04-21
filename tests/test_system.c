@@ -8,7 +8,7 @@
 #include "system.h"
 
 void test_add_full_vector(){
-    uint32_t n = 1000;
+    uint32_t n = 1000;   // size of the vector
     srand( time( NULL ) );
     uint8_t *v = malloc(n*sizeof(uint8_t));
     uint8_t *u = malloc(n*sizeof(uint8_t));
@@ -39,7 +39,7 @@ void test_add_full_vector(){
 }
 
 void test_add_full_vector_ret(){
-    uint32_t n = 1000;
+    uint32_t n = 1000;  // size of the vector
     srand( time( NULL ) );
     uint8_t *v = malloc(n*sizeof(uint8_t));
     uint8_t *u = malloc(n*sizeof(uint8_t));
@@ -75,8 +75,8 @@ void test_add_full_vector_ret(){
 }
 
 void test_mult_full_vector(){
-    uint32_t n = 1000;
-    uint32_t m_times = 25;
+    uint32_t n = 1000;    // size of the vector
+    uint32_t m_times = 25;   // test m times with different factors
     srand( time( NULL ) );
     uint8_t *v = malloc(n*sizeof(uint8_t));
     uint8_t *exp = malloc(n*sizeof(uint8_t));
@@ -103,8 +103,8 @@ void test_mult_full_vector(){
 }
 
 void test_mult_full_vector_ret(){
-    uint32_t n = 1000;
-    uint32_t m_times = 25;
+    uint32_t n = 1000;    // size of the vector
+    uint32_t m_times = 25;   // test m times with different factors
     srand( time( NULL ) );
     uint8_t *v = malloc(n*sizeof(uint8_t));
     uint8_t *v_copy = malloc(n*sizeof(uint8_t));
@@ -137,8 +137,8 @@ void test_mult_full_vector_ret(){
 }
 
 void test_inv_full_vector(){
-    uint32_t n = 1000;
-    uint32_t m_times = 25;
+    uint32_t n = 1000;   // size of the vector
+    uint32_t m_times = 25;   // test m times with different dividers
     srand( time( NULL ) );
     uint8_t *v = malloc(n*sizeof(uint8_t));
     uint8_t *exp = malloc(n*sizeof(uint8_t));
@@ -165,8 +165,8 @@ void test_inv_full_vector(){
 }
 
 void test_inv_full_vector_ret(){
-    uint32_t n = 1000;
-    uint32_t m_times = 25;
+    uint32_t n = 1000;     // size of the vector
+    uint32_t m_times = 25;  // test m times with differents dividers
     srand( time( NULL ) );
     uint8_t *v = malloc(n*sizeof(uint8_t));
     uint8_t *v_copy = malloc(n*sizeof(uint8_t));

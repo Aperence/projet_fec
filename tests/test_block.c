@@ -9,13 +9,13 @@
 
 void testSymbolLost(){
     srand( time( NULL ) );
-    uint32_t n_times = 1000;
-    uint32_t m = 500;
+    uint32_t n_times = 1000;   // execute test n_times times
+    uint32_t m = 500;          // size of symbol
     uint8_t *symbol = malloc(m*sizeof(uint8_t));
     uint32_t exp = 0;
     for (uint32_t i = 0; i < n_times; i++)
     {
-        int r = rand() % 10;
+        int r = rand() % 10;   // determine if symbol lost will be lost
         if (r<=1){
             exp = 1;
         }else{
@@ -45,7 +45,7 @@ void testBlockLost(){
     for (int i = 0; i < n; i++)
     {
         uint8_t *symbol = malloc(m*sizeof(uint8_t));
-        int r = rand() % 10;
+        int r = rand() % 10;     // determine if the symbol will be lost
         for (int j = 0; j < m; j++)
         {
             if (r<=1){

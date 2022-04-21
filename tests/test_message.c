@@ -4,19 +4,29 @@
 #include <stdint.h>
 #include <time.h>
 #include <sys/stat.h>
+#include <string.h>
 #include "gf256_tables.h"
 #include "test_system.h"
 #include "testRun.h"
 #include "system.h"
 #include "portable_endian.h"
 
+/**
+ * @brief Get the File Info and store them
+ * 
+ * @param path          : path of the output file (typically here ./expected/output.txt)
+ * @param fileRequest   : the name of the file we want to get the information
+ * @param size_filename : the size of the filename to be expected => we store in the pointer the value expected
+ * @param size_message  : the size of the message to be expected => we store in the pointer the value expected
+ * @return char* : the message expected to be store for this fileRequest
+ */
 char *getFileInfo(const char *path, const char *fileRequest, uint32_t *size_filename, uint64_t *size_message){
     uint32_t offset = 0;
     FILE *f = fopen(path, "r");
     struct stat st;
     stat(path, &st);
 
-    while (offset < st.st_size){
+    while (offset < st.st_size-1){  // while there is still files
         fread(size_filename, 4, 1, f);
         *size_filename = be32toh(*size_filename);
         //printf("Size processed filename %d\n", *size_filename);
@@ -26,26 +36,21 @@ char *getFileInfo(const char *path, const char *fileRequest, uint32_t *size_file
         *size_message = be64toh(*size_message);
         //printf("Size processed message %ld\n", *size_message);
 
-        char *filename = malloc(*size_filename);
+        char *filename = malloc((*size_filename)+1);
         fread(filename, 1, *size_filename, f);
+        *(filename + *size_filename) = '\0';
 
         //printf("File process : %s\n", filename);
-        char *message = malloc(*size_message);
+        char *message = malloc((*size_message) +1);
         fread(message, 1, *size_message, f);
+        *(message + *size_message) = '\0';
 
         //printf("File Loop : %s\n", filename);
-        uint8_t isSame = 1;
-        for (uint32_t k = 0; k < *size_filename; k++)
-        {
-            if (*(fileRequest + k) != *(filename + k)){
-                isSame = 0;
-                break;
-            }
-        }
+        uint8_t isSame = strcmp(fileRequest, filename);
 
         free(filename);
         
-        if (isSame){
+        if (isSame == 0){   // we found the file => return the messsage
             fclose(f);
             return message;
         }
@@ -70,7 +75,7 @@ void test_Message(){
 
     uint32_t offset = 0;
 
-    while (offset < st.st_size){
+    while (offset < st.st_size -1){
         uint32_t size_filename;
         fread(&size_filename, 4, 1, f);
         size_filename = be32toh(size_filename);
@@ -82,6 +87,7 @@ void test_Message(){
         //printf("Filename size : %d\tMessage size : %ld\n", size_filename, size_message);
         char *filename = malloc(size_filename+1);
         fread(filename, 1, size_filename, f);
+        *(filename + size_filename) = '\0';
 
         //printf("File Request %s\n", filename);
         uint32_t *size_filename_exp = malloc(sizeof(uint32_t));
@@ -89,8 +95,9 @@ void test_Message(){
         char *message_exp = getFileInfo(expectedResPath, filename, size_filename_exp, size_message_exp);
 
 
-        char *message = malloc(size_message);
+        char *message = malloc(size_message+1);
         fread(message, 1, size_message, f);
+        *(message+size_message) = '\0';
 
         if ( message_exp != NULL){
 
@@ -98,12 +105,8 @@ void test_Message(){
             //printf("Size filename : %d\tSize expected : %d\n", size_filename, size_filename_exp);
             CU_ASSERT_EQUAL(size_filename, *size_filename_exp);
             //printf("Size message : %ld\tSize expected : %d\n", size_message, size_message_exp);
-
+            CU_ASSERT_EQUAL(strcmp(message, message_exp), 0);
             
-            for (uint32_t i = 0; i < size_message; i++)
-            {
-                CU_ASSERT_EQUAL(*(message+i), *(message_exp+i));   // compare the characters of output files
-            }
             free(message_exp);
         }else{
             CU_ASSERT_TRUE(0);   // no filename found in expected => shouldn't be here

@@ -65,8 +65,8 @@ uint32_t makeLinearSystem(block_t *block, uint8_t *lost_indexes, uint32_t nb_unk
                 }
                 uint8_t *temp_ptr2 = *(b+i);
                 *(b+i) = gf_256_full_add_vector_ret(temp_ptr2, temp_ptr, size_symbol);
-                if (temp_ptr2 == NULL){
-                    fprintf(stderr, "Error with the malloc to make linear system (temporary pointer)\n");
+                if (*(b+i) == NULL){
+                    fprintf(stderr, "Error with the malloc to make linear system (temporary pointer 2)\n");
                     return -1;
                 }
                 free(temp_ptr);
@@ -139,7 +139,7 @@ uint32_t processBlock(block_t **list_block, uint8_t size, uint32_t seed, uint32_
         uint8_t *s = verifyBlock(*(list_block + i), &nb_unk, size_redundance, size_symbol);
         if (s == NULL) return -1;
 
-        if (nb_unk != 0){
+        if (nb_unk != 0){   // some symbols were lost
             if (args.verbose){
                 printf(">>>>>>Coeffs\n");
                 printMatrix(coeffs, size_redundance, (*(list_block))->size_block);
@@ -149,15 +149,25 @@ uint32_t processBlock(block_t **list_block, uint8_t size, uint32_t seed, uint32_
             uint8_t **A = malloc(sizeof(uint8_t *) * nb_unk);
             if (A == NULL){
                 fprintf(stderr, "Error with the malloc to create the matrix A for the linear system\n");
+                freeMatrix(coeffs, size_redundance);
+                free(s);
                 return -1;
             }
             uint8_t **b = malloc(sizeof(uint8_t *) * nb_unk);
             if (b == NULL){
                 fprintf(stderr, "Error with the malloc to create the matrix b for the linear system\n");
+                freeMatrix(coeffs, size_redundance);
+                free(s);
+                freeMatrix(A, nb_unk);
                 return -1;
             }
-            if (makeLinearSystem(*(list_block + i), s, nb_unk, coeffs, A, b, size_symbol)<0) return -1; // if error
-
+            if (makeLinearSystem(*(list_block + i), s, nb_unk, coeffs, A, b, size_symbol)<0) {
+                freeMatrix(coeffs, size_redundance);
+                free(s);
+                freeMatrix(A, nb_unk);
+                free(b);
+                return -1; // if error
+            }
 
             if (args.verbose){
                 printf(">>>>>>Linear System\n");
@@ -167,7 +177,13 @@ uint32_t processBlock(block_t **list_block, uint8_t size, uint32_t seed, uint32_
                 printf("\n");
             }
 
-            if (gf_256_gaussian_elimination(A, b, size_symbol , nb_unk)<0) return -1;
+            if (gf_256_gaussian_elimination(A, b, size_symbol , nb_unk)<0){
+                freeMatrix(coeffs, size_redundance);
+                free(s);
+                freeMatrix(A, nb_unk);
+                free(b);
+                return -1;
+            }
             
             if (args.verbose){
                 printf(">>>>>>Linear system solution\n");
