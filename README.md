@@ -47,7 +47,7 @@ $ sudo apt install bc
 You can then launch the execution time test by launching the following command in this directory : 
 
 ```bash
-./executionSpeed.sh
+$ ./executionSpeed.sh
 ```
 
 For example, the average speed we mesured for our program to run was ~ 10.817 ms.
@@ -55,17 +55,17 @@ For example, the average speed we mesured for our program to run was ~ 10.817 ms
 ## Known issues
 
 Frequently, when we runned the scripts `auto.sh` or `executionSpeed.sh`, we encountered the following errors:
-```
+```bash
 `$'make\r': command not found
 `$'\r''
 ```
 
 To fix these issues, try the following commands that worked for us (issues due to the encoding format of the scripts)
 
-```
-sudo apt install dos2unix
-dos2unix auto.sh
-dos2unix executionSpeed.sh
+```bash
+$ sudo apt install dos2unix
+$ dos2unix auto.sh
+$ dos2unix executionSpeed.sh
 ```
 
 You should then be able to run these scripts without any problem
