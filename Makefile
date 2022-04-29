@@ -28,6 +28,7 @@ test_system:  ./src/tinymt32.o tests/test_system.o src/system.o
 	$(CC) $(INCLUDE_HEADERS_DIRECTORY) $(INCLUDE_CUNIT) $(LINK_CUNIT) -o ./bin/$@ $^ -lcunit
 	./bin/$@
 
+# dont forget to  $ export LD_LIBRARY_PATH=$HOME/local/lib:$LD_LIBRARY_PATH
 tests: ./tests/testRun.o     ./tests/test_tinymt32.o ./src/tinymt32.o       tests/test_system.o src/system.o     tests/test_block.o  src/block.o    tests/test_message.o
 	@make
 	@./fec ./binary_exemple -f here.txt
@@ -45,9 +46,5 @@ check:
 	@valgrind ./testing
 	@valgrind ./fec ./binary_exemple -f here.txt
 	@make clean
-
-run:  ./src/block.o  ./src/system.o ./src/message.o  ./src/tinymt32.o
-	$(CC) $(CCFLAGS) $(INCLUDE_HEADERS_DIRECTORY) -o open $^
-	./open
 
 .PHONY: clean tests

@@ -16,14 +16,19 @@ with
 
 ```bash
 |
-|-- binary_exemple           : contain exemples of binary files with lost datas
-|-- expected                 : contains an exemple of expected result used by the tests
-|-- headers                  : contain headers of C files
-|-- src                      : contain all the C source code files   
-|-- tests                    : contains all the CUnit tests
-|-- auto.sh                  : script used to run the tests and memory leak checking (export LD_LIBRARY_PATH automaticaly)
-|-- main.c                   : main program calling the other files
-|-- executionSpeed.sh        : script to test the time taken to run our program
+|-- binary_exemple                : contain exemples of binary files with lost datas
+|-- expected                      : contains an exemple of expected result used by the tests
+|-- headers                       : contain headers of C files
+|-- src                           : contain all the C source code files   
+|-- tests                         : contains all the CUnit tests
+|-- utils                         : utility scripts
+|    |
+|    |-- auto.sh                  : script used to run the tests (export LD_LIBRARY_PATH automaticaly)
+|    |-- executionSpeed.sh        : script to test the time taken to run our program
+|    |-- Rapport_src              : source code for our latex report
+|
+|-- main.c                        : main program calling the other files
+
 ```
 
 ## Functions of source files
