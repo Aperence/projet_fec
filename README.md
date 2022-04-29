@@ -25,6 +25,7 @@ with
 |    |
 |    |-- auto.sh                  : script used to run the tests (export LD_LIBRARY_PATH automaticaly)
 |    |-- executionSpeed.sh        : script to test the time taken to run our program
+|    |-- graph.py                 : script used to generate our graphs to compare performances
 |    |-- Rapport_src              : source code for our latex report
 |
 |-- main.c                        : main program calling the other files
