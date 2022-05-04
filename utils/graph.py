@@ -1,3 +1,5 @@
+from cProfile import label
+from turtle import color
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -6,22 +8,22 @@ def bytes_to_Mb(bytes_nb):
 
 def create_memory():
     memory_C1 = bytes_to_Mb(1420107)
-    memory_python = 33
-    data = {'Python': memory_python, 'C':memory_C1}
-    
-    langage = list(data.keys())
-    memory = list(data.values())
-  
-    fig = plt.figure(figsize = (10, 5))
- 
-    # creating the bar plot
-    plt.bar(langage, memory, color ='maroon', width = 0.4)
- 
-    plt.xlabel("Langage")
-    plt.ylabel("Mémoire utilisée (Mo)")
+    memory_python = 32
+    x = ['Python', 'C']
+    y = [memory_python, memory_C1]
+    c = ['#2ca02c', '#1f77b4']
 
+    fig, ax = plt.subplots() 
+    width = 0.85 # the width of the bars 
+    ind = np.arange(len(y))  # the x locations for the groups
+    bars = ax.barh(ind, y, width, color = c)
+    ax.bar_label(bars)
+    ax.set_yticks(ind)
+    ax.set_yticklabels(x, minor=False)
     plt.title('Mémoire utilisée en C et Python')
-
+    plt.xlabel('Mémoire utilisée en Mb')
+    plt.ylabel('Langage')      
+    #plt.show()
     plt.savefig("memory.png")
 
 def create_speed():
@@ -31,22 +33,21 @@ def create_speed():
     speed_python = [52692.27, 103407.31, 208496.07, 518414.97]  
 
     fig, ax = plt.subplots(1, 2, sharex =False , sharey = False)
-    ax[0].plot(x, speed_C1)
-    ax[0].plot(x,speed_C4)
-    ax[0].plot(x, speed_python)
+
+    ax[0].plot(x, speed_python, color="#0cad57", label="Python")
     ax[0].grid(True, axis="y")
     ax[0].set_xlabel("Nombre de fichiers")
-    
 
-    ax[1].plot(x, speed_C1)
-    ax[1].plot(x,speed_C4)
-    ax[1].plot(x, speed_python)
-    ax[1].set_yscale("log")
+    ax[1].plot(x, speed_C1, label="C avec 1 thread")
+    ax[1].plot(x,speed_C4, label="C avec 4 threads")
     ax[1].set_xlabel("Nombre de fichiers")
     ax[1].grid(True, axis="y")
     ax[1].set_ylabel("Vitesse d'exécution (Ms)")
     ax[1].yaxis.set_label_coords(1.1,0.48)
-    plt.legend(["C avec 1 thread", "C avec 4 threads", "Python"], loc='upper center', bbox_to_anchor=(-0.123, 1.10),
+
+    lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]   # https://stackoverflow.com/questions/9834452/how-do-i-make-a-single-legend-for-many-subplots-with-matplotlib
+    lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
+    plt.legend(lines, labels, loc='upper center', bbox_to_anchor=(-0.123, 1.10),
             ncol=3, fancybox=True, shadow=True)
 
     plt.savefig("speed.png")

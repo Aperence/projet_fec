@@ -19,6 +19,9 @@ clean:
 	@rm -f ./*.o
 	@rm -f ./testing
 	@rm -f ./here.txt
+	@rm -f ./utils/speed.png
+	@rm -f ./utils/memory.png
+	@rm -f ./utils/consumption.png
 
 test_tinymn32: ./tests/test_tinymt32.o ./src/tinymt32.o
 	$(CC) $(INCLUDE_HEADERS_DIRECTORY) $(INCLUDE_CUNIT) $(LINK_CUNIT) -o ./bin/$@ $^ -lcunit
