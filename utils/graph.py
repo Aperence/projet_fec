@@ -1,5 +1,3 @@
-from cProfile import label
-from turtle import color
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -75,7 +73,7 @@ def create_consumption():
 
 x = " "
 while (not (x.lower() in "msca")):
-    x = input("Select type : (M, S, C, A): ")
+    x = input("Select type (Memory, Speed, Consumption, All): (M, S, C, A): ")
 if (x.lower() in "ma") :
     create_memory()
 if (x.lower() in "sa"):
