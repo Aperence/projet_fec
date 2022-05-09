@@ -5,12 +5,28 @@
 To run our program, you just have to launch the following commands in a prompt:
 ```bash
 $ make
-$ fec INPUT_DIRECTORY -f OUTPUT_FILE -n NUMBER_THREADS
+$ ./fec INPUT_DIRECTORY -f OUTPUT_FILE -n NUMBER_THREADS
 ```
 with 
 - `INPUT_DIRECTORY` : path to a directory containing files to be processed to recover symbols
 -  `OUTPUT_FILE` : path to a file which will contain the former content of the processed files
 -  `NUMBER_THREADS` : the number of threads we want to execute the program with
+
+## Run the tests and checks
+
+To run our tests, you can run the following commands to run our tests:
+```bash
+export LD_LIBRARY_PATH=$HOME/local/lib:$LD_LIBRARY_PATH
+export CFLAGS='-gdwarf-2 -gstrict-dwarf'    # comply to use older dwarf version
+make
+make tests
+```
+In order to use the check on files, you can use the following commands:
+```bash
+make
+make check
+```
+
 
 ## Directories organisation
 

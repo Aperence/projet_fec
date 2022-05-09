@@ -27,22 +27,22 @@ char *getFileInfo(const char *path, const char *fileRequest, uint32_t *size_file
     stat(path, &st);
 
     while (offset < st.st_size-1){  // while there is still files
-        fread(size_filename, 4, 1, f);
+        if (fread(size_filename, 4, 1, f) != 1) {CU_ASSERT_TRUE(0); exit(1);}
         *size_filename = be32toh(*size_filename);
         //printf("Size processed filename %d\n", *size_filename);
 
         
-        fread(size_message, 8, 1, f);
+        if(fread(size_message, 8, 1, f) != 1) {CU_ASSERT_TRUE(0); exit(1);}
         *size_message = be64toh(*size_message);
         //printf("Size processed message %ld\n", *size_message);
 
         char *filename = malloc((*size_filename)+1);
-        fread(filename, 1, *size_filename, f);
+        if (fread(filename, 1, *size_filename, f) != *size_filename) {CU_ASSERT_TRUE(0); exit(1);}
         *(filename + *size_filename) = '\0';
 
         //printf("File process : %s\n", filename);
         char *message = malloc((*size_message) +1);
-        fread(message, 1, *size_message, f);
+        if (fread(message, 1, *size_message, f) != *size_message) {CU_ASSERT_TRUE(0); exit(1);}
         *(message + *size_message) = '\0';
 
         //printf("File Loop : %s\n", filename);
@@ -77,16 +77,16 @@ void test_Message(){
 
     while (offset < st.st_size -1){
         uint32_t size_filename;
-        fread(&size_filename, 4, 1, f);
+        if (fread(&size_filename, 4, 1, f) != 1) {CU_ASSERT_TRUE(0); exit(1);}
         size_filename = be32toh(size_filename);
 
         uint64_t size_message;
-        fread(&size_message, 8, 1, f);
+        if (fread(&size_message, 8, 1, f) != 1) {CU_ASSERT_TRUE(0); exit(1);}
         size_message = be64toh(size_message);
         
         //printf("Filename size : %d\tMessage size : %ld\n", size_filename, size_message);
         char *filename = malloc(size_filename+1);
-        fread(filename, 1, size_filename, f);
+        if (fread(filename, 1, size_filename, f) != size_filename) {CU_ASSERT_TRUE(0); exit(1);}
         *(filename + size_filename) = '\0';
 
         //printf("File Request %s\n", filename);
@@ -96,7 +96,7 @@ void test_Message(){
 
 
         char *message = malloc(size_message+1);
-        fread(message, 1, size_message, f);
+        if (fread(message, 1, size_message, f) != size_message) {CU_ASSERT_TRUE(0); exit(1);}
         *(message+size_message) = '\0';
 
         if ( message_exp != NULL){
@@ -121,6 +121,11 @@ void test_Message(){
     }
     fclose(f);
 }
+
+// seed = 40
+// block_size = 4
+// symbol_size = 3
+// redundancy = 2
 
 void addSuiteMessage(){
     printf("Loaded Message !\n");
