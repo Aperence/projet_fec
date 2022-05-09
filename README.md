@@ -14,7 +14,7 @@ with
 
 ## Run the tests and checks
 
-To run our tests, you can run the following commands to run our tests, while having CUnit installed in the $HOME/local directory:
+To run our tests, you can run the following commands to run our tests, while having CUnit installed in the `$HOME/local` directory:
 ```bash
 export LD_LIBRARY_PATH=$HOME/local/lib:$LD_LIBRARY_PATH
 export CFLAGS='-gdwarf-2 -gstrict-dwarf'    # comply to use older dwarf version
