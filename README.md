@@ -81,7 +81,7 @@ $ sudo apt install bc
 You can then launch the execution time test by launching the following command in this directory : 
 
 ```bash
-$ ./executionSpeed.sh NUMBER_TIMES NB_THREADS
+$ ./utils/executionSpeed.sh NUMBER_TIMES NB_THREADS
 ```
 
 For example, the average speed we mesured for our program to run was ~ 814.67 ms on a raspberry pi 3 with 200 files to process and 4 threads.
@@ -98,8 +98,8 @@ To fix these issues, try the following commands that worked for us (issues due t
 
 ```bash
 $ sudo apt install dos2unix
-$ dos2unix auto.sh
-$ dos2unix executionSpeed.sh
+$ dos2unix ./utils/auto.sh
+$ dos2unix ./utils/executionSpeed.sh
 ```
 
 You should then be able to run these scripts without any problem
