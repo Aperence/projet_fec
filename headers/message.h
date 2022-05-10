@@ -38,7 +38,7 @@ uint32_t printMessage(message_t *m);
  *
  * @error : return NULL in case of error
  */
-char **readDir(DIR *directory, const char* directoryname);
+char **readDir(DIR *directory);
 
 /**
  * @brief Generate the list of block from a message

@@ -122,15 +122,32 @@ void test_Message(){
     fclose(f);
 }
 
+
+void test_readdir(){
+    
+}
+
 // seed = 40
 // block_size = 4
 // symbol_size = 3
 // redundancy = 2
 
+void test_makeBlockList(){
+    FILE *expected = fopen("./expected/makeblocklist_expected.txt", "r");
+
+    FILE *f = fopen("./expected/makeblocklist.bin", "r");
+
+    fclose(f);
+
+    fclose(expected);
+}
+
 void addSuiteMessage(){
     printf("Loaded Message !\n");
     CU_pSuite suite = CU_add_suite("message", 0, 0);
     CU_add_test(suite, "test recovered message", test_Message);
+    CU_add_test(suite, "test readdir", test_readdir);
+    CU_add_test(suite, "test make block list", test_makeBlockList);
 }
 
 #if MULTIPLE

@@ -36,7 +36,7 @@ uint32_t printMessage(message_t *m){
 }
 
 
-char **readDir(DIR *directory, const char* directoryname){
+char **readDir(DIR *directory){
     struct dirent *entry;
 
     t_args.numberFiles = -2;   // remove "." and ".." from directory
@@ -49,13 +49,9 @@ char **readDir(DIR *directory, const char* directoryname){
     while ((entry = readdir(directory))){
         (t_args.numberFiles)++;
     }
-    closedir(directory);
-    
-    directory = opendir(directoryname);  // we now read the filenames
-    if (directory == NULL){
-        fprintf(stderr, "Error with the opening of the directory\n");
-        return NULL;
-    }
+
+    rewinddir(directory);
+
     char **filenames = malloc(t_args.numberFiles*(sizeof(char *)));
     if (filenames == NULL){
         fprintf(stderr, "Error with the malloc which represents the files to be processed\n");

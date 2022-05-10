@@ -9,7 +9,7 @@ $ ./fec INPUT_DIRECTORY -f OUTPUT_FILE -n NUMBER_THREADS
 ```
 with 
 - `INPUT_DIRECTORY` : path to a directory containing files to be processed to recover symbols
--  `OUTPUT_FILE` : path to a file which will contain the former content of the processed files
+-  `OUTPUT_FILE` : path to a file (can be a new file) which will contain the former content of the processed files
 -  `NUMBER_THREADS` : the number of threads we want to execute the program with
 
 ## Run the tests and checks

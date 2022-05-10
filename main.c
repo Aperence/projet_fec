@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
         exit(EXIT_SUCCESS);
     }
 
-    t_args.filenames = readDir(args.input_dir, args.input_dir_path);
+    t_args.filenames = readDir(args.input_dir);
 
     t_args.semaphore_read = my_sem_init(1);
 
