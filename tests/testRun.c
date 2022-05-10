@@ -6,6 +6,7 @@
 #include "main.h"
 
 args_t args;
+threads_args_t t_args;
 
 int main(int argc, char const *argv[])
 {

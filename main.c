@@ -149,13 +149,6 @@ int main(int argc, char *argv[])
     
     free(t_args.filenames);
     
-    /**
-    // Close the input directory and the output file
-    err = closedir(args.input_dir);
-    if (err < 0)
-    {
-        fprintf(stderr, "Error while closing the input directory containing the instance files\n");
-    }*/
     if (args.output_stream != stdout)
     {
         fclose(args.output_stream);

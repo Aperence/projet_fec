@@ -61,7 +61,7 @@ block_t **makeBlockList(uint32_t numberBlocks, uint8_t *message, uint32_t block_
  * @brief Return a message containing all the information needed to recover the content of file
  * 
  * @param filename : The name of the file to process
- * @return A struct containing the list of blocks representing the content of file and informations contained by this fil
+ * @return A struct containing the list of blocks representing the content of file and informations contained by this file
  *
  * @error : return NULL in case of error
  */

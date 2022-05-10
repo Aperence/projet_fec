@@ -4,11 +4,14 @@
 #include <stdint.h>
 #include <time.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <string.h>
+#include <dirent.h>
 #include "gf256_tables.h"
 #include "test_system.h"
 #include "testRun.h"
 #include "system.h"
+#include "message.h"
 #include "portable_endian.h"
 
 /**
@@ -124,7 +127,27 @@ void test_Message(){
 
 
 void test_readdir(){
+    DIR *d = opendir("./binary_exemple");
+
+    uint32_t index = 0;
+
+    char **res = readDir(d);
+
+    d = opendir("./binary_exemple");
+    struct dirent *entry;
     
+    while ((entry = readdir(d))){
+        if (strcasecmp("..", entry->d_name) == 0 || strcasecmp(".", entry->d_name) == 0){
+            continue;
+        }
+        CU_ASSERT_EQUAL(strcasecmp(*(res+index), entry->d_name), 0);
+        free(*(res+index));
+        index++;
+    }
+
+    free(res);
+
+    closedir(d);
 }
 
 // seed = 40
@@ -136,6 +159,77 @@ void test_makeBlockList(){
     FILE *expected = fopen("./expected/makeblocklist_expected.txt", "r");
 
     FILE *f = fopen("./expected/makeblocklist.bin", "r");
+
+    uint32_t seed;
+    if (fread(&seed, 4, 1, f) != 1){CU_ASSERT_TRUE(0); exit(1);}
+    seed = be32toh(seed);
+
+    uint32_t block_size;
+    if (fread(&block_size, 4, 1, f) != 1){CU_ASSERT_TRUE(0); exit(1);}
+    block_size = be32toh(block_size);
+
+    uint32_t symbol_size; 
+    if (fread(&symbol_size, 4, 1, f) != 1){CU_ASSERT_TRUE(0); exit(1);}
+
+    symbol_size = be32toh(symbol_size);
+    
+    uint32_t redundance_size;
+    if (fread(&redundance_size, 4, 1, f) != 1) {CU_ASSERT_TRUE(0); exit(1);};
+    redundance_size = be32toh(redundance_size);
+
+    uint64_t messageSize;
+    if (fread(&messageSize, 8, 1, f) != 1){CU_ASSERT_TRUE(0); exit(1);}
+    messageSize = be64toh(messageSize);
+
+    struct stat st;
+
+    stat("./expected/makeblocklist.bin", &st);
+
+    uint8_t *message = malloc(st.st_size - 24);
+    if (fread(message, 1, st.st_size - 24, f) != st.st_size - 24){CU_ASSERT_TRUE(0); exit(1);}
+
+    uint32_t numberBlocks = messageSize / (block_size * symbol_size);
+    if ((messageSize % (block_size * symbol_size)) != 0) numberBlocks++;
+
+    uint32_t padding = symbol_size - (messageSize % symbol_size);
+    block_t **res = makeBlockList(numberBlocks,message,block_size,symbol_size,redundance_size, messageSize,padding);
+    free(message);
+
+    CU_ASSERT_EQUAL(seed, 40);
+    CU_ASSERT_EQUAL(block_size, 4);
+    CU_ASSERT_EQUAL(symbol_size, 3);
+    CU_ASSERT_EQUAL(redundance_size, 2);
+    CU_ASSERT_EQUAL(messageSize, 115);
+
+    uint8_t c;
+
+    uint32_t actual_block = 0;
+    uint32_t actual_symbol = 0;
+    uint32_t char_symbol = 0;
+    uint32_t index = 0;
+    while ((c = fgetc(expected)) != EOF && index > messageSize)
+    {
+        index++;
+        block_t *block = *(res+actual_block);
+        CU_ASSERT_EQUAL(c, *(*(block->symb_list + actual_symbol)+char_symbol));
+        char_symbol++;
+        if (char_symbol >= symbol_size){
+            char_symbol = 0;
+            actual_symbol++;
+        }
+        if (actual_symbol >= block_size){
+            actual_symbol = 0;
+            actual_block++;
+        }
+
+    }
+
+    for (uint32_t i = 0; i < numberBlocks; i++)
+    {
+        freeBlock(*(res+i), redundance_size);
+    }
+    
+    free(res);
 
     fclose(f);
 
