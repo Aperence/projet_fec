@@ -1,3 +1,6 @@
+#ifdef __APPLE__
+#include <sys/syslimits.h>  // include PATH_MAX
+#endif
 #ifndef MAIN_H
 #define MAIN_H
 

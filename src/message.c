@@ -60,7 +60,7 @@ char **readDir(DIR *directory){
 
     int i = 0;
     while ((entry = readdir(directory))){
-        if (!strcmp(entry->d_name, "..") == 0 && !strcmp(entry->d_name, ".") == 0){
+        if (!(strcmp(entry->d_name, "..") == 0) && !(strcmp(entry->d_name, ".") == 0)){
             char *filename = malloc(256);
             if (filename == NULL){
                 fprintf(stderr, "Error with the malloc which represents the file to be processed\n");

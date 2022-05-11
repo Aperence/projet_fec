@@ -8,8 +8,9 @@ static inline sem_t *
 my_sem_init_with_name(char *name, uint32_t value)
 {
 #ifdef __APPLE__
-    int rc = sem_unlink(name);
-    sem_t *s;
+    //int rc = sem_unlink(name);  => unused variable exception
+    //sem_t *s;                   => unused variable exception
+    sem_unlink(name);
     return sem_open(name, O_CREAT, 0644, value);
 #else
     sem_t *sem = malloc(sizeof(sem_t));
