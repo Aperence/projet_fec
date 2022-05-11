@@ -56,17 +56,9 @@ uint32_t makeLinearSystem(block_t *block, uint8_t *lost_indexes, uint32_t nb_unk
 uint32_t fillLostSymbol(block_t *block, uint8_t **symbols, uint8_t *lost_indexes, uint32_t size_redundance);
 
 /**
- * @brief Free the pointers in the matrix and the pointer of the matrix
- * 
- * @param matrix : The matrix to free
- * @param rows : Number of rows in the matrix
- */
-uint32_t freeMatrix(uint8_t **matrix, uint32_t rows);
-
-/**
  * @brief For each block of list_block, recover the lost symbols in the block and fill them in it
  * 
- * @param list_block : A list of blocks
+ * @param list_block : A list of blocks pointers
  * @param size : Size of the list
  * @param seed : Seed used to generate redundancy
  * @param size_redundancy : the number of redundancy symbols in blocks
@@ -74,7 +66,7 @@ uint32_t freeMatrix(uint8_t **matrix, uint32_t rows);
  *
  * @error : return -1 in case of error
  */
-uint32_t processBlock(block_t **list_block, uint8_t size, uint32_t seed, uint32_t size_redundance, uint32_t size_symbol);
+uint32_t processBlocks(block_t **list_block, uint8_t size, uint32_t seed, uint32_t size_redundance, uint32_t size_symbol);
 
 /**
  * @brief Free the memory used by block

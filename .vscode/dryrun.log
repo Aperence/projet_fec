@@ -1,0 +1,11 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/thomas/Documents/UCL/BAC2/Q2/LEPL1503-Projet_3/Projet/lepl-1503-2022-skeleton-group-v-2'
+gcc  -Iheaders -I/home/thomas/local/include -Wall -Werror -g -std=gnu99 -O3 -o main.o -c main.c
+gcc  -Iheaders -I/home/thomas/local/include -Wall -Werror -g -std=gnu99 -O3 -o src/block.o -c src/block.c
+gcc  -Iheaders -I/home/thomas/local/include -Wall -Werror -g -std=gnu99 -O3 -o src/message.o -c src/message.c
+gcc  -Iheaders -I/home/thomas/local/include -Wall -Werror -g -std=gnu99 -O3 -o src/system.o -c src/system.c
+gcc  -Iheaders -I/home/thomas/local/include -Wall -Werror -g -std=gnu99 -O3 -o src/tinymt32.o -c src/tinymt32.c
+gcc  -Iheaders -I/home/thomas/local/include -Wall -Werror -g -std=gnu99 -O3 -o src/my_threads.o -c src/my_threads.c
+gcc  -Iheaders -Wall -Werror -g -std=gnu99 -O3 -o fec main.o src/block.o src/message.o src/system.o src/tinymt32.o src/my_threads.o -lpthread
+make: Leaving directory '/home/thomas/Documents/UCL/BAC2/Q2/LEPL1503-Projet_3/Projet/lepl-1503-2022-skeleton-group-v-2'
+ 

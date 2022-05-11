@@ -32,7 +32,7 @@ make check
 
 ```bash
 |
-|-- binary_exemple                : contain exemples of binary files with lost datas
+|-- binary_example                : contain exemples of binary files with lost datas
 |-- expected                      : contains an exemple of expected result used by the tests
 |-- headers                       : contain headers of C files
 |-- src                           : contain all the C source code files   

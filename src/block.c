@@ -91,38 +91,7 @@ uint32_t fillLostSymbol(block_t *block, uint8_t **symbols, uint8_t *lost_indexes
     return 0;
 }
 
-uint32_t freeMatrix(uint8_t **matrix, uint32_t rows){
-    for (uint32_t i = 0; i < rows; i++)
-    {
-        free(*(matrix+i));
-    }
-    free(matrix);
-    return 0;
-}
-
-uint32_t freeBlock(block_t *block, uint32_t size_redundance){
-    freeMatrix(block->symb_list, block->size_block + size_redundance);
-    free(block);
-    return 0;
-}
-
-
-uint32_t printBlock(block_t *block, uint32_t size_redundance, uint32_t size_symbol){
-    for (int i = 0; i < block->size_block + size_redundance; i++)
-    {
-        printf("[ ");
-        for (uint32_t j = 0; j < size_symbol; j++)
-        {
-            printf("%d ",*(*(block->symb_list + i) + j));
-        }
-        printf("]\n");
-    }
-    printf("\n\n");
-    return 0;
-}
-
-
-uint32_t processBlock(block_t **list_block, uint8_t size, uint32_t seed, uint32_t size_redundance, uint32_t size_symbol){
+uint32_t processBlocks(block_t **list_block, uint8_t size, uint32_t seed, uint32_t size_redundance, uint32_t size_symbol){
     tinymt32_t prng;
     memset(&prng, 0, sizeof(tinymt32_t));
     prng.mat1 = 0x8f7011ee;
@@ -199,5 +168,27 @@ uint32_t processBlock(block_t **list_block, uint8_t size, uint32_t seed, uint32_
         free(s);
     }
     freeMatrix(coeffs, size_redundance);
+    return 0;
+}
+
+
+uint32_t freeBlock(block_t *block, uint32_t size_redundance){
+    freeMatrix(block->symb_list, block->size_block + size_redundance);
+    free(block);
+    return 0;
+}
+
+
+uint32_t printBlock(block_t *block, uint32_t size_redundance, uint32_t size_symbol){
+    for (int i = 0; i < block->size_block + size_redundance; i++)
+    {
+        printf("[ ");
+        for (uint32_t j = 0; j < size_symbol; j++)
+        {
+            printf("%d ",*(*(block->symb_list + i) + j));
+        }
+        printf("]\n");
+    }
+    printf("\n\n");
     return 0;
 }

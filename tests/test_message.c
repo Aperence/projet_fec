@@ -127,13 +127,13 @@ void test_Message(){
 
 
 void test_readdir(){
-    DIR *d = opendir("./binary_exemple");
+    DIR *d = opendir("./binary_example");
 
     uint32_t index = 0;
 
     char **res = readDir(d);
 
-    d = opendir("./binary_exemple");
+    d = opendir("./binary_example");
     struct dirent *entry;
     
     while ((entry = readdir(d))){
@@ -223,7 +223,7 @@ void test_makeBlockList(){
         }
 
     }
-
+    
     for (uint32_t i = 0; i < numberBlocks; i++)
     {
         freeBlock(*(res+i), redundance_size);

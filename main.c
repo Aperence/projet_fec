@@ -16,6 +16,9 @@
 #include "my_threads.h"
 
 
+//All our function specifications are defined in our headers. 
+//In this way, we have respected the logic received in the given files such as system.h in order to keep the whole project coherent.
+
 args_t args;
 
 threads_args_t t_args;
@@ -29,7 +32,7 @@ void usage(char *prog_name)
     fprintf(stderr, "    -n n_threads (default: 4): set the number of computing threads that will be used to execute the RLC algorithm\n");
     fprintf(stderr, "    -v : enable debugging messages. If not set, no such messages will be displayed (except error messages on failure)\n");
 }
-
+//This function was given
 int parse_args(args_t *args, int argc, char *argv[])
 {
     memset(args, 0, sizeof(args_t));
@@ -88,6 +91,7 @@ int parse_args(args_t *args, int argc, char *argv[])
     return 0;
 }
 
+
 int main(int argc, char *argv[])
 {
     int err = parse_args(&args, argc, argv);
@@ -101,13 +105,14 @@ int main(int argc, char *argv[])
         exit(EXIT_SUCCESS);
     }
 
-    t_args.filenames = readDir(args.input_dir);
+    t_args.filenames = readDir(args.input_dir);   // get the list of filenames to process
 
-    t_args.semaphore_read = my_sem_init(1);
+    t_args.semaphore_read = my_sem_init(1); // These two semaphores allow to write while reading a file
 
     t_args.semaphore_writing = my_sem_init(1);
 
-    if (t_args.semaphore_read == NULL){
+    // check if there is any problem with the reading/writing process
+    if (t_args.semaphore_read == NULL){ 
         fprintf(stderr, "Error semaphore reading files\n");
         exit(EXIT_FAILURE);
     }
@@ -116,19 +121,19 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Error semaphore writing files\n");
         exit(EXIT_FAILURE);
     }
-    
-    pthread_t th[args.nb_threads];
 
-    uint32_t i;
+    //create the amount of threads given in input
+    pthread_t th[args.nb_threads];
     
-    for(i = 0; i< args.nb_threads;i++){
+    for(uint32_t i = 0; i< args.nb_threads;i++){
         if (pthread_create(&th[i], NULL, &processFile, &i) != 0){
             fprintf(stderr, "Error creating thread %s\n", strerror(errno));
             exit(EXIT_FAILURE);
         }
     }
     
-    for (i = 0; i < args.nb_threads; i++)
+    // wait for threads to end
+    for (uint32_t i = 0; i < args.nb_threads; i++)
     {
         if (pthread_join(th[i], NULL) != 0){
             fprintf(stderr, "Error joining thread %s\n", strerror(errno));
@@ -136,7 +141,7 @@ int main(int argc, char *argv[])
         };
     }
     
-
+    // check the destruction of the semaphore to avoid memory leak
     if (my_sem_destroy(t_args.semaphore_read) != 0){
         fprintf(stderr, "Error destroying semaphore reading %s\n", strerror(errno));
         exit(EXIT_FAILURE);
@@ -149,6 +154,7 @@ int main(int argc, char *argv[])
     
     free(t_args.filenames);
     
+    //close output file
     if (args.output_stream != stdout)
     {
         fclose(args.output_stream);

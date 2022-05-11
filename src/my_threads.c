@@ -39,7 +39,7 @@ void *processFile(void *args_file){
         }
         message_t *message = openFile(path);
         if (message == NULL) return NULL;
-        if (processBlock(message->listBlock, message->numberBlocks, message->seed, message->size_redundance, message->size_symbol)<0) return NULL;
+        if (processBlocks(message->listBlock, message->numberBlocks, message->seed, message->size_redundance, message->size_symbol)<0) return NULL;
         sem_wait(t_args.semaphore_writing);
         if (writeToFile(args.output_stream, message, *(t_args.filenames+fileNumber))<0) return NULL;
         sem_post(t_args.semaphore_writing);

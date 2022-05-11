@@ -5,21 +5,6 @@
 #include "tinymt32.h"
 
 /**
- * Print a matrix of size n x m to the standard output
- * @param matrix : the matrix to print
- * @param n : the number of rows of the matrix
- * @param m : the number of columns of the matrix
- */
-uint32_t printMatrix(uint8_t **matrix, uint32_t n, uint32_t m);
-
-/**
- * Print a vector of size "size" to the standard output
- * @param vector : the vector to print
- * @param size : the size of the vector
- */
-uint32_t printVector(uint8_t *vector, uint8_t size);
-
-/**
  *
  * Add two vectors in a Galois Field 256 in the vector symbol_1
  * @param symbol_1: the first symbol to add
@@ -100,5 +85,29 @@ uint32_t gf_256_gaussian_elimination(uint8_t **A, uint8_t **b, uint32_t symbol_s
  * @error : return NULL in case of error
  */
 uint8_t **gen_coefs(tinymt32_t prng, uint32_t nss, uint32_t nrs);
+
+
+/**
+ * @brief Free the pointers in the matrix and the pointer of the matrix
+ * 
+ * @param matrix : The matrix to free
+ * @param rows : Number of rows in the matrix
+ */
+uint32_t freeMatrix(uint8_t **matrix, uint32_t rows);
+
+/**
+ * Print a matrix of size n x m to the standard output
+ * @param matrix : the matrix to print
+ * @param n : the number of rows of the matrix
+ * @param m : the number of columns of the matrix
+ */
+uint32_t printMatrix(uint8_t **matrix, uint32_t n, uint32_t m);
+
+/**
+ * Print a vector of size "size" to the standard output
+ * @param vector : the vector to print
+ * @param size : the size of the vector
+ */
+uint32_t printVector(uint8_t *vector, uint8_t size);
 
 #endif /* SYSTEM_H */

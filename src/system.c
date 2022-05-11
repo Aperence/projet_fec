@@ -56,20 +56,6 @@ uint8_t *gf_256_inv_vector_ret(uint8_t *symbol_1, uint8_t coef, uint32_t symbol_
     return gf_256_mul_vector_ret(symbol_1, gf256_inv_table[coef], symbol_size);
 }
 
-
-uint32_t printMatrix(uint8_t **matrix, uint32_t n, uint32_t m){
-    for (int i = 0; i < n; i++)
-    {
-        printf("[ ");
-        for (int j = 0; j < m; j++)
-        {
-            printf("%d\t", *(*(matrix+i)+j));
-        }
-        printf(" ]\n");
-    }
-    return 0;  
-}
-
 uint32_t gf_256_gaussian_elimination(uint8_t **A, uint8_t **B, uint32_t symbol_size, uint32_t system_size){
     uint8_t factor = 0;
     // forward reduction  
@@ -151,4 +137,26 @@ uint32_t printVector(uint8_t *vector, uint8_t size){
     }
     printf(" ]\n");
     return 0;
+}
+
+uint32_t freeMatrix(uint8_t **matrix, uint32_t rows){
+    for (uint32_t i = 0; i < rows; i++)
+    {
+        free(*(matrix+i));
+    }
+    free(matrix);
+    return 0;
+}
+
+uint32_t printMatrix(uint8_t **matrix, uint32_t n, uint32_t m){
+    for (int i = 0; i < n; i++)
+    {
+        printf("[ ");
+        for (int j = 0; j < m; j++)
+        {
+            printf("%d\t", *(*(matrix+i)+j));
+        }
+        printf(" ]\n");
+    }
+    return 0;  
 }
