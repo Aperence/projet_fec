@@ -1,5 +1,7 @@
 # Project LEPL1503 : FEC
 
+Made with the help of **Botton** Florentin, **Accou** Pierre, **De Ro** Corentin, **Rixen** Thomas, **D'intino Salgado** Lorenzo
+
 ## Run the program
 
 To run our program, you just have to launch the following commands in a prompt:
