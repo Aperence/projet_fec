@@ -36,7 +36,6 @@ tests: ./tests/testRun.o     ./tests/test_tinymt32.o ./src/tinymt32.o    tests/t
 	@make
 	@./fec ./binary_example -f here.txt
 	@$(CC) $(INCLUDE_HEADERS_DIRECTORY) $(INCLUDE_CUNIT) $(LINK_CUNIT) -o ./testing $^ -lcunit
-	@./testing
 
 check:
 	@cppcheck ./src/system.c
