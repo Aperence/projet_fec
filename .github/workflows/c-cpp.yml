@@ -20,12 +20,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: deep5050/cppcheck-action@main
     - name: Set env
       run: echo "LD_LIBRARY_PATH=./CUnit_container/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
     - name: make tests
       run: make tests
     - name: run tests
       run : ./testing
-    - name : checks
-      run : make check
