@@ -28,5 +28,7 @@ jobs:
       run : ./testing
     - name: install cppchek
       run : sudo apt install cppcheck
+    - name: install valgrind
+      run : sudo apt install valgrind
     - name : checks
       run : make check
