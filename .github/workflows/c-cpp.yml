@@ -12,12 +12,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: configure
-      run: ./configure
-    - name: make
-      run: make
-    - name: make check
-      run: make check
-    - name: make test
-      run: make test
+    - uses: actions/checkout@v2
+    - name: make tests
+      run: make tests
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set env
+      run: echo "LD_LIBRARY_PATH=./CUnit_container/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+    - name: run check
+      run : make check
