@@ -3,7 +3,7 @@ CFLAGS=-Wall -Werror -g -std=gnu99 -O3
 LIBS=-lpthread
 INCLUDE_HEADERS_DIRECTORY=-Iheaders
 INCLUDE_CUNIT = -I./CUnit_container/
-LINK_CUNIT = -L./CUnit_container/lib
+LINK_CUNIT = -L./CUnit_container/lib/
 
 fec: main.o  ./src/block.o  ./src/message.o  ./src/system.o  ./src/tinymt32.o ./src/my_threads.o
 	$(CC) $(INCLUDE_HEADERS_DIRECTORY) $(CFLAGS) -o $@ $^ $(LIBS)
